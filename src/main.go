@@ -38,7 +38,7 @@ var placeholderNames = []string{
 
 func main() {
 
-	serverPort := "3333"
+	serverPort := "8033" // TODO: get from env
 
 	logger := slog.Default()
 	logger.Info("Starting web server…")
@@ -59,7 +59,7 @@ func main() {
 			"index.html.twig",
 			w,
 			map[string]stick.Value{
-				"placeholderNames": stick.Value(placeholderNames),
+				"placeholderNames": placeholderNames,
 			},
 		)
 		if err != nil {
@@ -189,7 +189,6 @@ func main() {
 
 	logger.Info("Visit http://localhost:" + serverPort)
 	_ = http.ListenAndServe(":"+serverPort, router)
-
 }
 
 func handleServerError(err error, writer http.ResponseWriter) {
