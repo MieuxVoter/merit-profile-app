@@ -70,19 +70,19 @@ func main() {
 	router.Get("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
 
 		query := r.URL.Query()
-		queryProposals := query["name"]
-		queryTalliesAsStrings := query["tally"]
-		queryH2l := query["h2l"]
+		queryProposals := query["n"]
+		queryTalliesAsStrings := query["t"]
+		queryHighToLow := query["h2l"]
 
 		// debug
-		//w.Write([]byte(fmt.Sprintf("%d queryH2l: %v\n", len(queryH2l), queryH2l)))
+		//w.Write([]byte(fmt.Sprintf("%d queryHighToLow: %v\n", len(queryHighToLow), queryHighToLow)))
 		//w.Write([]byte(fmt.Sprintf("query: %v\n", query)))
 		//w.Write([]byte(fmt.Sprintf("%d proposals: %v\n", len(queryProposals), queryProposals)))
 		//w.Write([]byte(fmt.Sprintf("%d tallies: %v\n", len(queryTalliesAsStrings), queryTalliesAsStrings)))
 
 		bestOnTheLeft := false
-		if len(queryH2l) > 0 {
-			if queryH2l[0] == "on" {
+		if len(queryHighToLow) > 0 {
+			if queryHighToLow[0] == "on" {
 				bestOnTheLeft = true
 			}
 		}
