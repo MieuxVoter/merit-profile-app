@@ -45,7 +45,6 @@ var placeholderNames = []string{
 func main() {
 
 	loadDotEnv()
-
 	serverPort := os.Getenv("WEB_PORT")
 
 	logger := slog.Default()
@@ -58,7 +57,6 @@ func main() {
 	)
 
 	router := chi.NewRouter()
-	//router.Use(middleware.RequestID) // not useful to us
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
