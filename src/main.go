@@ -23,22 +23,23 @@ import (
 )
 
 var placeholderNames = []string{
+	"Arancini",
+	"Burger",
+	"Chips",
+	"Dal",
+	"Empanadas",
+	"Fries",
+	"Gnocchis",
+	"Kale",
+	"Lasagna",
+	"Makis",
+	"Noodles",
+	"Oatmeal",
 	"Pizza",
-	"Pasta",
 	"Rice",
 	"Soup",
-	"Bread",
-	"Salad",
-	"Chips",
-	"Maki",
-	"Burger",
-	"Lentils",
 	"Tacos",
-	"Lasagna",
-	"Beans",
-	"Gnocchi",
-	"Spinach",
-	"Cake",
+	"Veggies",
 }
 
 func main() {
