@@ -1,0 +1,75 @@
+:root {
+    --main-color: #3c3c3c;
+    --main-bg-color: #e3e3e3;
+    --main-color-dim: hsl(from var(--main-color) h s calc(l + 20));
+    --main-color-dimmer: hsl(from var(--main-color) h s calc(l + 40));
+    --link-color: inherit;
+    --link-visited-color: inherit;
+    --link-hover-color: inherit;
+    --link-active-color: inherit;
+}
+@media screen and (prefers-color-scheme: dark) {
+    :root {
+        --main-color: #e3e3e3;
+        --main-bg-color: #1c1c1c;
+        --main-color-dim: hsl(from var(--main-color) h s calc(l - 20));
+        --main-color-dimmer: hsl(from var(--main-color) h s calc(l - 40));
+    }
+}
+@media print {
+    :root {
+        --main-color: #2c2c2c;
+        --main-bg-color: #ffffff;
+    }
+}
+body, textarea, input {
+    color: var(--main-color);
+    background-color: var(--main-bg-color);
+    border-width: 1px;
+}
+textarea {
+    width: 100%;
+    margin: 1em 0;
+    font-size: 1.618em;
+    font-family: monospace;
+}
+fieldset {
+    margin: 0.5em 0;
+    border-width: 1px;
+    border-color: var(--main-color-dimmer);
+}
+a:link { color: var(--link-color); }
+a:visited { color: var(--link-visited-color); }
+a:hover { color: var(--link-hover-color); }
+a:active { color: var(--link-active-color); }
+button[type=submit],
+input[type=submit] {
+    margin: 1em auto;
+    padding: 0.62em 1em;
+    cursor: pointer;
+    border-radius: 0.5em;
+}
+
+ul.inline li {
+    display: inline-flex;
+}
+
+/* FOOTER */
+
+footer {
+    font-size: 0.8em;
+}
+
+/* FORM SHENANIGANS */
+
+label:has(input[disabled]) {
+    opacity: 0.618;
+}
+fieldset.proposal {
+    display: none;
+}
+fieldset.proposal:nth-of-type(-n+4),
+fieldset.proposal:has(> input:not(:placeholder-shown)),
+fieldset.proposal:has(> input:not(:placeholder-shown)) + fieldset.proposal {
+    display: revert;
+}

@@ -1,21 +1,5 @@
 {% extends "base.html.twig" %}
 
-{% block style %}
-    <style>
-        label:has(input[disabled]) {
-            opacity: 0.618;
-        }
-        fieldset.proposal {
-            display: none;
-        }
-        fieldset.proposal:nth-of-type(-n+4),
-        fieldset.proposal:has(> input:not(:placeholder-shown)),
-        fieldset.proposal:has(> input:not(:placeholder-shown)) + fieldset.proposal {
-            display: revert;
-        }
-    </style>
-{% endblock %}
-
 {% block content %}
     <h1>Merit Profile Renderer</h1>
 
@@ -33,8 +17,6 @@
             </label>
         </fieldset>
 
-        <br>
-
         {% for i in 0..placeholderNames|length-1 %}
         <fieldset class="proposal">
             <input type="text" name="n"
@@ -48,7 +30,6 @@
         </fieldset>
         {% endfor %}
 
-        <br>
         <input type="submit" value="Generate">
     </form>
 {% endblock %}

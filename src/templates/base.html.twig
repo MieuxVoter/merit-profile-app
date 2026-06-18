@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Generate merit profiles from tallies, and rank proposals using Majority Judgment.">
+    <meta name="keywords" content="merit,poll,vote,majority,judgment,svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Merit Profile Renderer{% endblock %}</title>
-{% block style %}{% endblock %}
+    <link rel="icon" sizes="256x256" href="/favicon.png">
+{% block style_base %}
+    <link rel="stylesheet" media="all" href="/css/style.css">
+{% endblock %}
+{% block style_extra %}{% endblock %}
 </head>
 <body>
 {% block content %}{% endblock %}
 {% block footer %}
-    <style>
-        ul.inline li {
-            display: inline-flex;
-            font-size: 0.8em;
-        }
-    </style>
     <footer>
         <ul class="inline">
             <li>

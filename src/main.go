@@ -196,6 +196,9 @@ func main() {
 		_, _ = w.Write([]byte(svg))
 	})
 
+	staticFiles := http.FileServer(http.Dir("public"))
+	router.Handle("/*", http.StripPrefix("/", staticFiles))
+
 	logger.Info("Visit http://localhost:" + serverPort)
 	_ = http.ListenAndServe(":"+serverPort, router)
 }

@@ -1,4 +1,4 @@
-# Merit Profile Generator
+# Merit Profile Renderer
 
 [![MIT](https://img.shields.io/github/license/MieuxVoter/merit-profile-app?style=for-the-badge)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/MieuxVoter/merit-profile-app?include_prereleases&style=for-the-badge)](https://github.com/MieuxVoter/merit-profile-app/releases)
@@ -11,7 +11,8 @@ Try it out at https://educ.mieuxvoter.fr
 ## Roadmap
 
 - [x] Enter the tallies by hand using a form
+- [x] Docker configuration for deployment
+- [x] Support static files (for favicon, CSS…)
 - [ ] Import a CSV file
 - [ ] Rank the proposals using Majority Judgment
-- [x] Docker configuration for deployment
-- [ ] Support static files (for favicon, CSS…)
+- [ ] Localization
