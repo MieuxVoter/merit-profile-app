@@ -14,6 +14,7 @@ import (
 	"github.com/tyler-sommer/stick/twig"
 	"log/slog"
 	"main/src/templates"
+	"main/src/version"
 	"net/http"
 	"os"
 	"slices"
@@ -66,6 +67,7 @@ func main() {
 			w,
 			map[string]stick.Value{
 				"placeholderNames": placeholderNames,
+				"version":          version.GetVersion(),
 			},
 		)
 		if err != nil {
