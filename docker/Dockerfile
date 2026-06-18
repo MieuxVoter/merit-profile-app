@@ -27,4 +27,5 @@ WORKDIR /app
 COPY --from=builder /build/build/mpa ./
 COPY --from=builder /build/.env ./
 COPY --from=builder /build/.env.local ./
+COPY --from=builder /build/public ./
 CMD ["/app/mpa"]
