@@ -21,4 +21,17 @@ services:
       target: runner
     restart: unless-stopped
     volumes:
-    - "./docker/volumes/var/:/app/var/"
+      - "./docker/volumes/var/:/app/var/"
+    ports:
+      - "8033:8033"
+
+#  nginx:
+#    image: nginx:1-alpine
+#    restart: unless-stopped
+#    depends_on:
+#      - app
+#    volumes:
+#      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+#      - ./public:/app/public:ro
+#    ports:
+#      - "8033:80"

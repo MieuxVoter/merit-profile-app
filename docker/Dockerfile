@@ -23,7 +23,7 @@ WORKDIR /app
 # Example of how we could copy stuff from the provider image
 #COPY --from=provider /etc/fonts/conf.d/70-fonts-noto-cjk.conf /etc/fonts/conf.d
 # And now we copy the app itself and its config
-COPY --from=builder /build/mpa ./
+COPY --from=builder /build/build/mpa ./
 COPY --from=builder /build/.env ./
 COPY --from=builder /build/.env.local ./
 CMD ["/app/mpa"]
