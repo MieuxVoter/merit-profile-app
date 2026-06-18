@@ -1,19 +1,19 @@
 {% extends "base.html.twig" %}
 
 {% block style %}
-<style>
-label:has(input[disabled]) {
-    opacity: 0.618;
-}
-fieldset.proposal {
-    display: none;
-}
-fieldset.proposal:nth-of-type(-n+4),
-fieldset.proposal:has(> input:not(:placeholder-shown)),
-fieldset.proposal:has(> input:not(:placeholder-shown)) + fieldset.proposal {
-    display: revert;
-}
-</style>
+    <style>
+        label:has(input[disabled]) {
+            opacity: 0.618;
+        }
+        fieldset.proposal {
+            display: none;
+        }
+        fieldset.proposal:nth-of-type(-n+4),
+        fieldset.proposal:has(> input:not(:placeholder-shown)),
+        fieldset.proposal:has(> input:not(:placeholder-shown)) + fieldset.proposal {
+            display: revert;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -40,7 +40,7 @@ fieldset.proposal:has(> input:not(:placeholder-shown)) + fieldset.proposal {
                    maxlength="32">
             <input type="text" name="tally" placeholder="4,12,0,9,5,1,7"
                    pattern="\s*\d+\s*(\s*,\s*\d+\s*)*"
-                   title="Amounts of each grades received by this proposal, from lowest (worst) grade to highest (best) grade, separated by commas (,)">
+                   title="Tally of the grades received by this proposal, from lowest (worst) grade to highest (best) grade, separated by commas (,)">
         </fieldset>
         {% endfor %}
 
