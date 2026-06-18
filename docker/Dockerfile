@@ -1,6 +1,7 @@
 FROM dhi.io/golang:1.26-debian13-dev AS builder
 WORKDIR /build
 COPY . /build
+RUN touch .env.local
 RUN make clean
 RUN --mount=type=cache,sharing=locked,target=/go/pkg/mod \
     --mount=type=cache,sharing=locked,target=/root/.cache/go-build \

@@ -1,5 +1,8 @@
 # Docker
 /compose.override.yaml
 
+# Custom conf & secrets
+/.env.local
+
 # IDE
 /.idea
