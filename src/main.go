@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 	"github.com/mieuxvoter/majority-judgment-library-go/judgment"
 	"github.com/mieuxvoter/merit-profile-library-go/merit"
 	"github.com/tyler-sommer/stick"
@@ -14,6 +15,7 @@ import (
 	"log/slog"
 	"main/src/templates"
 	"net/http"
+	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -40,7 +42,9 @@ var placeholderNames = []string{
 
 func main() {
 
-	serverPort := "8033" // TODO: get from env
+	loadDotEnv()
+
+	serverPort := os.Getenv("WEB_PORT")
 
 	logger := slog.Default()
 	logger.Info("Starting web server…")
@@ -52,7 +56,7 @@ func main() {
 	)
 
 	router := chi.NewRouter()
-	router.Use(middleware.RequestID)
+	//router.Use(middleware.RequestID) // not useful to us
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
@@ -215,4 +219,16 @@ func deserializeTally(tallyAsString string) ([]uint64, error) {
 		out[i] = t
 	}
 	return out, nil
+}
+
+// loadDotEnv loads Environment variables from files, for convenience.
+func loadDotEnv() {
+	err := godotenv.Load(".env.local")
+	if err != nil {
+		fmt.Println("No .env.local file found.  Best create one by copying .env.")
+	}
+	err = godotenv.Load() // .env
+	if err != nil {
+		fmt.Println("No .env file found.  Odd.")
+	}
 }

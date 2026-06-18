@@ -23,7 +23,8 @@ services:
     volumes:
       - "./docker/volumes/var/:/app/var/"
     ports:
-      - "8033:8033"
+      # Pitfall: this uses .env but NOT .env.local
+      - "${WEB_PORT:-8033}:${WEB_PORT:-8033}"
 
 #  nginx:
 #    image: nginx:1-alpine
