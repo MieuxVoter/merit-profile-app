@@ -184,6 +184,7 @@ func main() {
 			handleServerError(err, w)
 		}
 
+		w.Header().Add("Content-Type", "image/svg+xml")
 		_, _ = w.Write([]byte(svg))
 	})
 
