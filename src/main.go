@@ -203,7 +203,7 @@ func deserializeTally(tallyAsString string) ([]uint64, error) {
 	spliceOfStrings := strings.Split(tallyAsString, ",")
 	out := make([]uint64, len(spliceOfStrings))
 	for i, s := range spliceOfStrings {
-		t, err := strconv.ParseUint(s, 10, 64)
+		t, err := strconv.ParseUint(strings.TrimSpace(s), 10, 64)
 		if err != nil {
 			return out, err
 		}
