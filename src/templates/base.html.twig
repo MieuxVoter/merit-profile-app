@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+    <title>{% block title %}Merit Profile Renderer{% endblock %}</title>
+{% block style %}{% endblock %}
+</head>
+<body>
+{% block content %}{% endblock %}
+{% block footer %}
+    <style>
+        ul.inline li {
+            display: inline-flex;
+        }
+    </style>
+    <footer>
+        <ul class="inline">
+            <li>
+                <a href="https://mieuxvoter.fr">MieuxVoter</a>
+            </li>
+            <li>—</li>
+            <li>
+                <a href="https://app.mieuxvoter.fr">Web App</a>
+            </li>
+            <li>—</li>
+            <li>
+                <a href="https://play.google.com/store/apps/details?id=fr.mieuxvoter.urn">Android App</a>
+            </li>
+        </ul>
+    </footer>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,49 @@
+{% extends "base.html.twig" %}
+
+{% block style %}
+<style>
+label:has(input[disabled]) {
+    opacity: 0.618;
+}
+fieldset.proposal {
+    display: none;
+}
+fieldset.proposal:nth-of-type(-n+4),
+fieldset.proposal:has(> input:not(:placeholder-shown)),
+fieldset.proposal:has(> input:not(:placeholder-shown)) + fieldset.proposal {
+    display: revert;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Merit Profile Renderer</h1>
+
+    <form action="merit.svg" method="get">
+
+        <fieldset>
+            <label title="If checked, the generated merit profiles will be sorted from highest to lowest.">
+                <input type="checkbox" name="sort" disabled>
+                (TODO ⚠) Sort using Majority Judgment
+            </label>
+            <br>
+            <label title="By default, this tool expects grades amounts from the lowest grade to the highest grade.  If checked, the order of the input grades amounts is reversed.">
+                <input type="checkbox" name="h2l">
+                Highest Grade on the Left
+            </label>
+        </fieldset>
+
+        {% for i in 0..placeholderNames|length-1 %}
+        <fieldset class="proposal">
+            <input type="text" name="name"
+                   placeholder="{{ placeholderNames[i] }}"
+                   maxlength="32">
+            <input type="text" name="tally" placeholder="4,12,0,9,5,1,7"
+                   pattern="\s*\d+\s*(\s*,\s*\d+\s*)*"
+                   title="Amounts of each grades received by this proposal, from lowest (worst) grade to highest (best) grade, separated by commas (,)">
+        </fieldset>
+        {% endfor %}
+
+        <input type="submit" value="Generate">
+    </form>
+{% endblock %}
