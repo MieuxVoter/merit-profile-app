@@ -192,10 +192,12 @@ func main() {
 }
 
 func handleServerError(err error, writer http.ResponseWriter) {
+	writer.WriteHeader(500)
 	_, _ = writer.Write([]byte(err.Error()))
 }
 
 func handleUserError(err error, writer http.ResponseWriter) {
+	writer.WriteHeader(401)
 	_, _ = writer.Write([]byte(err.Error()))
 }
 
