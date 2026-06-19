@@ -13,12 +13,12 @@ import (
 	"github.com/tyler-sommer/stick"
 	"github.com/tyler-sommer/stick/twig"
 	"log/slog"
+	"main/src/input"
 	"main/src/templates"
 	"main/src/version"
 	"net/http"
 	"os"
 	"slices"
-	"strconv"
 	"strings"
 )
 
@@ -45,7 +45,10 @@ var placeholderNames = []string{
 func main() {
 
 	loadDotEnv()
-	serverPort := os.Getenv("WEB_PORT")
+	serverPort, foundServerPort := os.LookupEnv("WEB_PORT")
+	if !foundServerPort {
+		panic("Environment variable WEB_PORT is required.")
+	}
 
 	logger := slog.Default()
 	logger.Info("Starting web server…")
@@ -88,8 +91,8 @@ func main() {
 		//w.Write([]byte(fmt.Sprintf("%d proposals: %v\n", len(queryProposals), queryProposals)))
 		//w.Write([]byte(fmt.Sprintf("%d tallies: %v\n", len(queryTalliesAsStrings), queryTalliesAsStrings)))
 
-		bestOnTheLeft := checkboxQueryToBool(queryHighToLow)
-		doSortWithMj := checkboxQueryToBool(querySortWithMj)
+		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
+		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
 
 		amountOfPossibleProposals := len(queryTalliesAsStrings)
 
@@ -108,7 +111,7 @@ func main() {
 				continue
 			}
 
-			queryTally, err := deserializeTally(queryTallyString)
+			queryTally, err := input.DeserializeTally(queryTallyString)
 			if err != nil {
 				handleUserError(err, w)
 				return
@@ -180,7 +183,8 @@ func main() {
 			return
 		}
 
-		// Rule: proposals are ranked in the merit profile
+		// Rule: proposals may be ranked in the merit profile
+		// We compute the rank even if we do not use it.  I'm okay with this, it's cheap.
 		deliberator := &judgment.MajorityJudgment{}
 		pollResult, err := deliberator.Deliberate(pollTally)
 		if err != nil {
@@ -223,9 +227,11 @@ func main() {
 		_, _ = w.Write([]byte(svg))
 	})
 
+	// We also want to serve some static files, like CSS and the favicon
 	staticFiles := http.FileServer(http.Dir("public"))
 	router.Handle("/*", http.StripPrefix("/", staticFiles))
 
+	// Finally, let's start the webserver and wait for an interrupting signal
 	logger.Info("Visit http://localhost:" + serverPort)
 	_ = http.ListenAndServe(":"+serverPort, router)
 }
@@ -240,34 +246,11 @@ func handleUserError(err error, writer http.ResponseWriter) {
 	_, _ = writer.Write([]byte(err.Error()))
 }
 
-func checkboxQueryToBool(queryParamValue []string) bool {
-	out := false
-	if len(queryParamValue) > 0 {
-		if queryParamValue[0] == "on" {
-			out = true
-		}
-	}
-	return out
-}
-
-func deserializeTally(tallyAsString string) ([]uint64, error) {
-	spliceOfStrings := strings.Split(tallyAsString, ",")
-	out := make([]uint64, len(spliceOfStrings))
-	for i, s := range spliceOfStrings {
-		t, err := strconv.ParseUint(strings.TrimSpace(s), 10, 64)
-		if err != nil {
-			return out, err
-		}
-		out[i] = t
-	}
-	return out, nil
-}
-
 // loadDotEnv loads Environment variables from files, for convenience.
 func loadDotEnv() {
 	err := godotenv.Load(".env.local")
 	if err != nil {
-		fmt.Println("No .env.local file found.  Best create one by copying .env.")
+		//fmt.Println("No .env.local file found.  You may create one by copying .env.")
 	}
 	err = godotenv.Load() // .env
 	if err != nil {
