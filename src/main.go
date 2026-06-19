@@ -80,6 +80,7 @@ func main() {
 		queryProposals := query["n"]
 		queryTalliesAsStrings := query["t"]
 		queryHighToLow := query["h2l"]
+		querySortWithMj := query["mj"]
 
 		// debug
 		//w.Write([]byte(fmt.Sprintf("%d queryHighToLow: %v\n", len(queryHighToLow), queryHighToLow)))
@@ -87,12 +88,9 @@ func main() {
 		//w.Write([]byte(fmt.Sprintf("%d proposals: %v\n", len(queryProposals), queryProposals)))
 		//w.Write([]byte(fmt.Sprintf("%d tallies: %v\n", len(queryTalliesAsStrings), queryTalliesAsStrings)))
 
-		bestOnTheLeft := false
-		if len(queryHighToLow) > 0 {
-			if queryHighToLow[0] == "on" {
-				bestOnTheLeft = true
-			}
-		}
+		bestOnTheLeft := checkboxQueryToBool(queryHighToLow)
+		doSortWithMj := checkboxQueryToBool(querySortWithMj)
+
 		amountOfPossibleProposals := len(queryTalliesAsStrings)
 
 		proposalsNames := make([]string, 0)
@@ -170,13 +168,43 @@ func main() {
 			}
 		}
 
+		pollTally := &judgment.PollTally{
+			Proposals:      proposalsTallies,
+			AmountOfJudges: amountOfJudges,
+		}
+
+		// Rule: the "worst" grade is the default grade
+		// We will never have to balance, since we do a balance check above, but safe > sorry.
+		balanceErr := pollTally.BalanceWithStaticDefault(0)
+		if balanceErr != nil {
+			return
+		}
+
+		// Rule: proposals are ranked in the merit profile
+		deliberator := &judgment.MajorityJudgment{}
+		pollResult, err := deliberator.Deliberate(pollTally)
+		if err != nil {
+			return
+		}
+
 		meritProposals := make([]merit.Proposal, amountOfProposals)
 		for i := range amountOfProposals {
-			meritProposal := merit.Proposal{
-				Name:  proposalsNames[i],
-				Tally: proposalsTallies[i].Tally,
+			actualIndex := i
+			if doSortWithMj {
+				actualIndex = pollResult.ProposalsSorted[i].Index
 			}
-			meritProposals[i] = meritProposal
+			actualName := proposalsNames[actualIndex]
+			if doSortWithMj {
+				actualName = fmt.Sprintf(
+					"#%d ⋅ %s",
+					pollResult.ProposalsSorted[i].Rank,
+					actualName,
+				)
+			}
+			meritProposals[i] = merit.Proposal{
+				Name:  actualName,
+				Tally: proposalsTallies[actualIndex].Tally,
+			}
 		}
 
 		renderOptions := []merit.RenderOptions{
@@ -210,6 +238,16 @@ func handleServerError(err error, writer http.ResponseWriter) {
 func handleUserError(err error, writer http.ResponseWriter) {
 	writer.WriteHeader(401)
 	_, _ = writer.Write([]byte(err.Error()))
+}
+
+func checkboxQueryToBool(queryParamValue []string) bool {
+	out := false
+	if len(queryParamValue) > 0 {
+		if queryParamValue[0] == "on" {
+			out = true
+		}
+	}
+	return out
 }
 
 func deserializeTally(tallyAsString string) ([]uint64, error) {
