@@ -22,7 +22,7 @@ func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
 
 	localizer, localizerFound := l.Localizers[language.(string)]
 	if !localizerFound {
-		localizer = l.Localization.GetLocalizer(language.(string))
+		localizer = l.Localization.GetLocalizer(language.(string), "en")
 		l.Localizers[language.(string)] = localizer
 	}
 

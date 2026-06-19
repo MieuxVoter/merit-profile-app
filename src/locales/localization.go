@@ -11,6 +11,8 @@ import (
 //go:embed locale.*.toml
 var LocaleFS embed.FS
 
+//var DefaultLanguage = "en"
+
 // Localization is our main localization service.
 // It basically acts as a factory for Localizer.
 type Localization struct {
@@ -65,10 +67,7 @@ type Localizer struct {
 
 // T translates the message identified by its key
 func (l *Localizer) T(key string) string {
-	s, err := l.Localizer.LocalizeMessage(&i18n.Message{ID: key})
-	if err != nil {
-		panic(err)
-	}
+	s, _ := l.Localizer.LocalizeMessage(&i18n.Message{ID: key})
 	return s
 }
 

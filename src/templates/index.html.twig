@@ -6,14 +6,14 @@
     <form action="merit.svg" method="get">
 
         <fieldset>
-            <label title="If checked, the generated merit profiles will be sorted from highest to lowest.">
+            <label title="{{ 'SettingRankWithMjTitle'|t }}">
                 <input type="checkbox" name="mj">
-                Rank using Majority Judgment
+                {{ 'SettingRankWithMjLabel'|t }}
             </label>
             <br>
-            <label title="By default, this tool expects grades amounts from the lowest grade to the highest grade.  If checked, the order of the input grades amounts is reversed.">
+            <label title="{{ 'SettingHighToLowTitle'|t }}">
                 <input type="checkbox" name="h2l">
-                Highest Grade on the Left
+                {{ 'SettingHighToLowLabel'|t }}
             </label>
         </fieldset>
 
@@ -30,6 +30,6 @@
         </fieldset>
         {% endfor %}
 
-        <input type="submit" value="Generate">
+        <input type="submit" value="{{ 'ActionGenerate'|t }}">
     </form>
 {% endblock %}
