@@ -6,6 +6,7 @@ import (
 
 type LocalizationExtension struct {
 	Localization *Localization
+	Localizers   map[string]*Localizer // memoization of localizers
 }
 
 func (l LocalizationExtension) Init(e *stick.Env) error {
@@ -13,13 +14,25 @@ func (l LocalizationExtension) Init(e *stick.Env) error {
 	return nil
 }
 
-func FilterTranslateFactory(l LocalizationExtension) func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {
+func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
+	language, languageFound := ctx.Scope().Get("language")
+	if !languageFound {
+		language = stick.Value("en")
+	}
+
+	localizer, localizerFound := l.Localizers[language.(string)]
+	if !localizerFound {
+		localizer = l.Localization.GetLocalizer(language.(string))
+		l.Localizers[language.(string)] = localizer
+	}
+
+	return localizer
+}
+
+func FilterTranslateFactory(
+	l LocalizationExtension,
+) func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {
 	return func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {
-		language, found := ctx.Scope().Get("language")
-		if !found {
-			language = stick.Value("en")
-		}
-		localizer := l.Localization.GetLocalizer(language.(string))
-		return stick.Value(localizer.T(val.(string)))
+		return stick.Value(l.FindLocalizer(ctx).T(val.(string)))
 	}
 }

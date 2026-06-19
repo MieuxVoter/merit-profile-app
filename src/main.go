@@ -67,6 +67,7 @@ func main() {
 	)
 	err := templateEngine.Register(locales.LocalizationExtension{
 		Localization: localization,
+		Localizers:   make(map[string]*locales.Localizer),
 	})
 	if err != nil {
 		panic(err)
