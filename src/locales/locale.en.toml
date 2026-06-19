@@ -10,9 +10,14 @@ other = "Rank using Majority Judgment"
 [SettingRankWithMjTitle]
 other = "If checked, the generated merit profiles will be sorted from highest to lowest."
 
-[SettinghighToLowLabel]
+[SettingHighToLowLabel]
 other = "Highest Grade on the Left"
 
-[SettinghighToLowTitle]
+[SettingHighToLowTitle]
 other = "By default, this tool expects grades amounts from the lowest grade to the highest grade.  If checked, the order of the input grades amounts is reversed."
 
+[FieldProposalNameTitle]
+other = "Name of the proposal #{{.Value0}}"
+
+[FieldProposalTallyTitle]
+other = "Tally of the grades received by the proposal #{{.Value0}}, from lowest (worst) grade to highest (best) grade, separated by commas (,)"

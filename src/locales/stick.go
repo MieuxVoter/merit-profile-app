@@ -1,6 +1,7 @@
 package locales
 
 import (
+	"fmt"
 	"github.com/tyler-sommer/stick"
 )
 
@@ -15,15 +16,19 @@ func (l LocalizationExtension) Init(e *stick.Env) error {
 }
 
 func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
-	language, languageFound := ctx.Scope().Get("language")
+	languageValue, languageFound := ctx.Scope().Get("language")
+	language := languageValue.(string)
 	if !languageFound {
-		language = stick.Value("en")
+		language = l.Localization.DefaultLanguage
 	}
 
-	localizer, localizerFound := l.Localizers[language.(string)]
+	localizer, localizerFound := l.Localizers[language]
 	if !localizerFound {
-		localizer = l.Localization.GetLocalizer(language.(string), "en")
-		l.Localizers[language.(string)] = localizer
+		localizer = l.Localization.GetLocalizer(
+			language,
+			l.Localization.DefaultLanguage,
+		)
+		l.Localizers[language] = localizer
 	}
 
 	return localizer
@@ -33,6 +38,13 @@ func FilterTranslateFactory(
 	l LocalizationExtension,
 ) func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {
 	return func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {
+		if len(args) > 0 {
+			data := make(map[string]interface{})
+			for i, arg := range args {
+				data[fmt.Sprintf("Value%d", i)] = arg
+			}
+			return stick.Value(l.FindLocalizer(ctx).Tf(val.(string), data))
+		}
 		return stick.Value(l.FindLocalizer(ctx).T(val.(string)))
 	}
 }

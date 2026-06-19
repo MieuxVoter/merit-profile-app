@@ -13,6 +13,7 @@ import (
 	"github.com/strukturag/goacceptlanguageparser"
 	"github.com/tyler-sommer/stick"
 	"github.com/tyler-sommer/stick/twig"
+	"golang.org/x/text/language"
 	"log/slog"
 	"main/src/input"
 	"main/src/locales"
@@ -58,7 +59,7 @@ func main() {
 	localization := &locales.Localization{
 		Logger: logger,
 	}
-	localization.Init()
+	localization.Init(language.English)
 
 	templateEngine := twig.New(
 		&templates.EmbedFSLoader{

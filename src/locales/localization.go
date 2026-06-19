@@ -16,14 +16,16 @@ var LocaleFS embed.FS
 // Localization is our main localization service.
 // It basically acts as a factory for Localizer.
 type Localization struct {
-	Logger *slog.Logger
-	Bundle *i18n.Bundle
+	Logger          *slog.Logger
+	Bundle          *i18n.Bundle
+	Languages       []string
+	DefaultLanguage string
 }
 
 // Init must be run right after instantiating a new Localization
 // Its job is to load the message files that Localizer will use.
-func (l *Localization) Init() {
-	l.Bundle = i18n.NewBundle(language.English)
+func (l *Localization) Init(defaultLanguage language.Tag) {
+	l.Bundle = i18n.NewBundle(defaultLanguage)
 	l.Bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 
 	dirEntries, err := LocaleFS.ReadDir(".")
@@ -41,6 +43,9 @@ func (l *Localization) Init() {
 			panic(err)
 		}
 	}
+
+	l.Languages = l.getLanguages()
+	l.DefaultLanguage = l.Languages[0]
 }
 
 func (l *Localization) GetLocalizer(languages ...string) *Localizer {
@@ -50,8 +55,8 @@ func (l *Localization) GetLocalizer(languages ...string) *Localizer {
 	}
 }
 
-// GetLanguages returns the available languages, starting with the default one.
-func (l *Localization) GetLanguages() []string {
+// getLanguages returns the available languages, starting with the default one.
+func (l *Localization) getLanguages() []string {
 	languages := make([]string, 0)
 	for _, tag := range l.Bundle.LanguageTags() {
 		languages = append(languages, tag.String())
