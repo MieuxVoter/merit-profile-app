@@ -10,10 +10,12 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mieuxvoter/majority-judgment-library-go/judgment"
 	"github.com/mieuxvoter/merit-profile-library-go/merit"
+	"github.com/strukturag/goacceptlanguageparser"
 	"github.com/tyler-sommer/stick"
 	"github.com/tyler-sommer/stick/twig"
 	"log/slog"
 	"main/src/input"
+	"main/src/locales"
 	"main/src/templates"
 	"main/src/version"
 	"net/http"
@@ -53,23 +55,45 @@ func main() {
 	logger := slog.Default()
 	logger.Info("Starting web server…")
 
+	localization := &locales.Localization{
+		Logger: logger,
+	}
+	localization.Init()
+
 	templateEngine := twig.New(
 		&templates.EmbedFSLoader{
 			FS: templates.TemplatesFS,
 		},
 	)
+	err := templateEngine.Register(locales.LocalizationExtension{
+		Localization: localization,
+	})
+	if err != nil {
+		panic(err)
+	}
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+
+		userAcceptedLanguages := goacceptlanguageparser.ParseAcceptLanguage(
+			r.Header.Get("Accept-Language"),
+			[]string{"en", "fr"}, // TODO: handle the list of supported languages
+		)
+		language := "en"
+		if len(userAcceptedLanguages) > 0 {
+			language = userAcceptedLanguages[0]
+		}
+
 		err := templateEngine.Execute(
 			"index.html.twig",
 			w,
 			map[string]stick.Value{
 				"placeholderNames": placeholderNames,
 				"version":          version.GetVersion(),
+				"language":         language,
 			},
 		)
 		if err != nil {
