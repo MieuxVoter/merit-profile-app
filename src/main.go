@@ -24,26 +24,6 @@ import (
 	"strings"
 )
 
-var placeholderNames = []string{
-	"Arancini",
-	"Burger",
-	"Chips",
-	"Dal",
-	"Empanadas",
-	"Fries",
-	"Gnocchis",
-	"Kale",
-	"Lasagna",
-	"Makis",
-	"Noodles",
-	"Oatmeal",
-	"Pizza",
-	"Rice",
-	"Soup",
-	"Tacos",
-	"Veggies",
-}
-
 // polyglotKey MUST be defined in all available language files.
 // We use it as a bit of a workaround to detect the user's language.
 var polyglotKey = "AppTitle"
@@ -83,10 +63,12 @@ func main() {
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 
-		_, userLanguage := localization.NewLocalizerAndLanguage(
+		localizer, userLanguage := localization.NewLocalizerAndLanguage(
 			polyglotKey,
 			r.Header.Get("Accept-Language"),
 		)
+
+		placeholderNames := getPlaceholderNames(localizer)
 
 		err := templateEngine.Execute(
 			"index.html.twig",
@@ -109,6 +91,8 @@ func main() {
 			polyglotKey,
 			r.Header.Get("Accept-Language"),
 		)
+
+		placeholderNames := getPlaceholderNames(localizer)
 
 		query := r.URL.Query()
 		queryProposals := query["n"]
@@ -288,4 +272,17 @@ func loadDotEnv() {
 	if err != nil {
 		fmt.Println("No .env file found.  Odd.")
 	}
+}
+
+func getPlaceholderNames(localizer *locales.Localizer) []string {
+	return readAsCsvSlice(localizer, "ProposalNamePlaceholders")
+}
+
+func readAsCsvSlice(localizer *locales.Localizer, key string) []string {
+	placeholderNamesString := localizer.T(key)
+	placeholderNames := strings.Split(placeholderNamesString, ",")
+	for i := range placeholderNames {
+		placeholderNames[i] = strings.TrimSpace(placeholderNames[i])
+	}
+	return placeholderNames
 }
