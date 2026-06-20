@@ -68,7 +68,7 @@ label:has(input[disabled]) {
 fieldset.proposal {
     display: none;
 }
-fieldset.proposal:nth-of-type(-n+4),
+fieldset.proposal:nth-of-type(-n+3),
 fieldset.proposal:has(> input:not(:placeholder-shown)),
 fieldset.proposal:has(> input:not(:placeholder-shown)) + fieldset.proposal {
     display: revert;

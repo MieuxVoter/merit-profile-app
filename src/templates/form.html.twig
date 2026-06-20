@@ -10,19 +10,10 @@
     {% endif %}
         >
 
-        <fieldset>
-            <label title="{{ 'SettingRankWithMjTitle'|t }}">
-                <input type="checkbox" name="mj">
-                {{ 'SettingRankWithMjLabel'|t }}
-            </label>
-            <br>
-            <label title="{{ 'SettingHighToLowTitle'|t }}">
-                <input type="checkbox" name="h2l">
-                {{ 'SettingHighToLowLabel'|t }}
-            </label>
-        </fieldset>
-
         {% if useCsv %}
+        <p>
+            Upload a CSV below or <a href="/">directly provide the tallies</a> instead.
+        </p>
         <fieldset class="upload">
             <label>
                 Upload a CSV file:&nbsp;&nbsp;&nbsp;
@@ -30,6 +21,9 @@
             </label>
         </fieldset>
         {% else %}
+        <p>
+            Provide the tallies below or <a href="/?csv">upload a CSV file</a> instead.
+        </p>
         {% for i in 0..placeholderNames|length-1 %}
         <fieldset class="proposal">
             <input type="text" name="n"
@@ -43,6 +37,18 @@
         </fieldset>
         {% endfor %}
         {% endif %}
+
+        <fieldset>
+            <label title="{{ 'SettingRankWithMjTitle'|t }}">
+                <input type="checkbox" name="mj">
+                {{ 'SettingRankWithMjLabel'|t }}
+            </label>
+            <br>
+            <label title="{{ 'SettingHighToLowTitle'|t }}">
+                <input type="checkbox" name="h2l">
+                {{ 'SettingHighToLowLabel'|t }}
+            </label>
+        </fieldset>
 
         <input type="submit" value="{{ 'ActionGenerate'|t }}">
     </form>
