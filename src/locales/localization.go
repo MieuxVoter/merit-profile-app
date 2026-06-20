@@ -16,8 +16,8 @@ var LocaleFS embed.FS
 type Localization struct {
 	Logger          *slog.Logger
 	Bundle          *i18n.Bundle
-	Languages       []string
-	DefaultLanguage string
+	Languages       []language.Tag
+	DefaultLanguage language.Tag
 }
 
 // Init must be run right after instantiating a new Localization
@@ -54,11 +54,35 @@ func (l *Localization) NewLocalizer(languages ...string) *Localizer {
 	}
 }
 
+func (l *Localization) NewLocalizerAndLanguage(
+	polyglotKey string, // make sure this translation key is defined in ALL available languages
+	languages ...string,
+) (*Localizer, language.Tag) {
+	languages = append(languages, l.DefaultLanguage.String())
+	localizer := l.NewLocalizer(languages...)
+
+	// Since we use the nice, complex detection of language from i18n, we need to ask the Localizer
+	// about the language tags it ended up detecting, especially as it filters by the available ones.
+	// This small hack is the only way I've found to get the actual default language of a Localizer.
+	_, lang, _ := localizer.Localizer.LocalizeWithTag(
+		&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{ID: polyglotKey},
+		},
+	)
+
+	guessedLanguage := lang
+	if lang == language.Und { // Und happens if the polyglotKey is not used in any language
+		guessedLanguage = l.DefaultLanguage
+	}
+
+	return localizer, guessedLanguage
+}
+
 // getLanguages returns the available languages, starting with the default one.
-func (l *Localization) getLanguages() []string {
-	languages := make([]string, 0)
+func (l *Localization) getLanguages() []language.Tag {
+	languages := make([]language.Tag, 0)
 	for _, tag := range l.Bundle.LanguageTags() {
-		languages = append(languages, tag.String())
+		languages = append(languages, tag)
 	}
 	return languages
 }

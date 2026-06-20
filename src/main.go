@@ -10,7 +10,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mieuxvoter/majority-judgment-library-go/judgment"
 	"github.com/mieuxvoter/merit-profile-library-go/merit"
-	"github.com/strukturag/goacceptlanguageparser"
 	"github.com/tyler-sommer/stick"
 	"github.com/tyler-sommer/stick/twig"
 	"golang.org/x/text/language"
@@ -44,6 +43,10 @@ var placeholderNames = []string{
 	"Tacos",
 	"Veggies",
 }
+
+// polyglotKey MUST be defined in all available language files.
+// We use it as a bit of a workaround to detect the user's language.
+var polyglotKey = "AppTitle"
 
 func main() {
 
@@ -80,14 +83,10 @@ func main() {
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 
-		userAcceptedLanguages := goacceptlanguageparser.ParseAcceptLanguage(
+		_, userLanguage := localization.NewLocalizerAndLanguage(
+			polyglotKey,
 			r.Header.Get("Accept-Language"),
-			localization.Languages,
 		)
-		userLanguage := localization.DefaultLanguage
-		if len(userAcceptedLanguages) > 0 {
-			userLanguage = userAcceptedLanguages[0]
-		}
 
 		err := templateEngine.Execute(
 			"index.html.twig",
@@ -95,7 +94,7 @@ func main() {
 			map[string]stick.Value{
 				"placeholderNames": placeholderNames,
 				"version":          version.GetVersion(),
-				"language":         userLanguage,
+				"language":         userLanguage.String(),
 			},
 		)
 		if err != nil {
@@ -106,9 +105,9 @@ func main() {
 
 	router.Get("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
 
-		localizer := localization.NewLocalizer(
+		localizer, _ := localization.NewLocalizerAndLanguage(
+			polyglotKey,
 			r.Header.Get("Accept-Language"),
-			localization.DefaultLanguage,
 		)
 
 		query := r.URL.Query()
@@ -116,12 +115,6 @@ func main() {
 		queryTalliesAsStrings := query["t"]
 		queryHighToLow := query["h2l"]
 		querySortWithMj := query["mj"]
-
-		// debug
-		//w.Write([]byte(fmt.Sprintf("%d queryHighToLow: %v\n", len(queryHighToLow), queryHighToLow)))
-		//w.Write([]byte(fmt.Sprintf("query: %v\n", query)))
-		//w.Write([]byte(fmt.Sprintf("%d proposals: %v\n", len(queryProposals), queryProposals)))
-		//w.Write([]byte(fmt.Sprintf("%d tallies: %v\n", len(queryTalliesAsStrings), queryTalliesAsStrings)))
 
 		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
 		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
@@ -194,7 +187,7 @@ func main() {
 
 			if currentAmountOfJudges != amountOfJudges {
 				err := errors.New(localizer.Tf(
-					"ErrorTallyUnbalanced",
+					"ErrorTallyImbalanced",
 					map[string]interface{}{
 						"Index":          i,
 						"Name":           proposalsNames[i],

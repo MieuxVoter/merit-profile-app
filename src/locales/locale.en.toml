@@ -1,6 +1,9 @@
 [AppTitle]
 other = "Merit Profile Renderer"
 
+[AppTitleZ]
+other = "NEIN TEST"
+
 [ActionGenerate]
 other = "Generate"
 
@@ -25,5 +28,5 @@ other = "Tally of the grades received by the proposal #{{.Value0}}, from lowest 
 [ErrorTallyInconsistent]
 other = "The amount of grades for proposal #{{.Index}} ({{.Name}}) is {{.Amount}} which is different from {{.ExpectedAmount}}, the expected amount of grades.  Please make sure your tallies are consistent."
 
-[ErrorTallyUnbalanced]
+[ErrorTallyImbalanced]
 other = "The total amount of judgments for proposal #{{.Index}} ({{.Name}}) is {{.Amount}} which is different from {{.ExpectedAmount}}, the expected amount of judgments.  Please make sure your tallies are balanced."

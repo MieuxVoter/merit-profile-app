@@ -23,14 +23,14 @@ func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
 	languageValue, languageFound := ctx.Scope().Get("language")
 	language := languageValue.(string)
 	if !languageFound {
-		language = l.Localization.DefaultLanguage
+		language = l.Localization.DefaultLanguage.String()
 	}
 
 	localizer, localizerFound := l.Localizers[language]
 	if !localizerFound {
 		localizer = l.Localization.NewLocalizer(
 			language,
-			l.Localization.DefaultLanguage,
+			l.Localization.DefaultLanguage.String(),
 		)
 		l.Localizers[language] = localizer
 	}
