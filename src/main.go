@@ -12,8 +12,10 @@ import (
 	"github.com/mieuxvoter/merit-profile-library-go/merit"
 	"github.com/tyler-sommer/stick"
 	"github.com/tyler-sommer/stick/twig"
+	"golang.org/x/text/language"
 	"log/slog"
 	"main/src/input"
+	"main/src/locales"
 	"main/src/templates"
 	"main/src/version"
 	"net/http"
@@ -22,25 +24,9 @@ import (
 	"strings"
 )
 
-var placeholderNames = []string{
-	"Arancini",
-	"Burger",
-	"Chips",
-	"Dal",
-	"Empanadas",
-	"Fries",
-	"Gnocchis",
-	"Kale",
-	"Lasagna",
-	"Makis",
-	"Noodles",
-	"Oatmeal",
-	"Pizza",
-	"Rice",
-	"Soup",
-	"Tacos",
-	"Veggies",
-}
+// polyglotKey MUST be defined in all available language files.
+// We use it as a bit of a workaround to detect the user's language.
+var polyglotKey = "AppTitle"
 
 func main() {
 
@@ -53,43 +39,66 @@ func main() {
 	logger := slog.Default()
 	logger.Info("Starting web server…")
 
+	localization := &locales.Localization{
+		Logger: logger,
+	}
+	localization.Init(language.English)
+
 	templateEngine := twig.New(
 		&templates.EmbedFSLoader{
 			FS: templates.TemplatesFS,
 		},
 	)
+	twigErr := templateEngine.Register(locales.LocalizationExtension{
+		Localization: localization,
+		Localizers:   make(map[string]*locales.Localizer),
+	})
+	if twigErr != nil {
+		panic(twigErr)
+	}
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+
+		localizer, userLanguage := localization.NewLocalizerAndLanguage(
+			polyglotKey,
+			r.Header.Get("Accept-Language"),
+		)
+
+		placeholderNames := getPlaceholderNames(localizer)
+
 		err := templateEngine.Execute(
 			"index.html.twig",
 			w,
 			map[string]stick.Value{
 				"placeholderNames": placeholderNames,
 				"version":          version.GetVersion(),
+				"language":         userLanguage.String(),
 			},
 		)
 		if err != nil {
 			handleServerError(err, w)
+			return
 		}
 	})
 
 	router.Get("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
+
+		localizer, _ := localization.NewLocalizerAndLanguage(
+			polyglotKey,
+			r.Header.Get("Accept-Language"),
+		)
+
+		placeholderNames := getPlaceholderNames(localizer)
 
 		query := r.URL.Query()
 		queryProposals := query["n"]
 		queryTalliesAsStrings := query["t"]
 		queryHighToLow := query["h2l"]
 		querySortWithMj := query["mj"]
-
-		// debug
-		//w.Write([]byte(fmt.Sprintf("%d queryHighToLow: %v\n", len(queryHighToLow), queryHighToLow)))
-		//w.Write([]byte(fmt.Sprintf("query: %v\n", query)))
-		//w.Write([]byte(fmt.Sprintf("%d proposals: %v\n", len(queryProposals), queryProposals)))
-		//w.Write([]byte(fmt.Sprintf("%d tallies: %v\n", len(queryTalliesAsStrings), queryTalliesAsStrings)))
 
 		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
 		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
@@ -147,24 +156,28 @@ func main() {
 			}
 
 			if currentAmountOfGrades != amountOfGrades {
-				err := errors.New(fmt.Sprintf(
-					"The amount of grades for proposal #%d (%s) is %d which is different from %d, the expected amount of grades.  Please make sure your tallies are consistent.",
-					i,
-					proposalsNames[i],
-					currentAmountOfGrades,
-					amountOfGrades,
+				err := errors.New(localizer.Tf(
+					"ErrorTallyInconsistent",
+					map[string]interface{}{
+						"Index":          i,
+						"Name":           proposalsNames[i],
+						"Amount":         currentAmountOfGrades,
+						"ExpectedAmount": amountOfGrades,
+					},
 				))
 				handleUserError(err, w)
 				return
 			}
 
 			if currentAmountOfJudges != amountOfJudges {
-				err := errors.New(fmt.Sprintf(
-					"The total amount of judgments for proposal #%d (%s) is %d which is different from %d, the expected amount of judgments.  Please make sure your tallies are balanced.",
-					i,
-					proposalsNames[i],
-					currentAmountOfJudges,
-					amountOfJudges,
+				err := errors.New(localizer.Tf(
+					"ErrorTallyImbalanced",
+					map[string]interface{}{
+						"Index":          i,
+						"Name":           proposalsNames[i],
+						"Amount":         currentAmountOfJudges,
+						"ExpectedAmount": amountOfJudges,
+					},
 				))
 				handleUserError(err, w)
 				return
@@ -180,14 +193,16 @@ func main() {
 		// We will never have to balance, since we do a balance check above, but safe > sorry.
 		balanceErr := pollTally.BalanceWithStaticDefault(0)
 		if balanceErr != nil {
+			handleServerError(balanceErr, w)
 			return
 		}
 
 		// Rule: proposals may be ranked in the merit profile
 		// We compute the rank even if we do not use it.  I'm okay with this, it's cheap.
 		deliberator := &judgment.MajorityJudgment{}
-		pollResult, err := deliberator.Deliberate(pollTally)
-		if err != nil {
+		pollResult, deliberationErr := deliberator.Deliberate(pollTally)
+		if deliberationErr != nil {
+			handleServerError(deliberationErr, w)
 			return
 		}
 
@@ -215,12 +230,13 @@ func main() {
 			merit.WithBestGradeOnLeft(bestOnTheLeft),
 			merit.WithWidth(980),
 		}
-		svg, err := merit.RenderLinearProfileSVG(
+		svg, renderErr := merit.RenderLinearProfileSVG(
 			meritProposals,
 			renderOptions...,
 		)
-		if err != nil {
-			handleServerError(err, w)
+		if renderErr != nil {
+			handleServerError(renderErr, w)
+			return
 		}
 
 		w.Header().Add("Content-Type", "image/svg+xml")
@@ -256,4 +272,17 @@ func loadDotEnv() {
 	if err != nil {
 		fmt.Println("No .env file found.  Odd.")
 	}
+}
+
+func getPlaceholderNames(localizer *locales.Localizer) []string {
+	return readAsCsvSlice(localizer, "ProposalNamePlaceholders")
+}
+
+func readAsCsvSlice(localizer *locales.Localizer, key string) []string {
+	placeholderNamesString := localizer.T(key)
+	placeholderNames := strings.Split(placeholderNamesString, ",")
+	for i := range placeholderNames {
+		placeholderNames[i] = strings.TrimSpace(placeholderNames[i])
+	}
+	return placeholderNames
 }

@@ -13,6 +13,6 @@ Try it out at https://educ.mieuxvoter.fr
 - [x] Enter the tallies by hand using a form
 - [x] Docker configuration for deployment
 - [x] Support static files (for favicon, CSS…)
+- [x] Rank the proposals using Majority Judgment
+- [x] Localization
 - [ ] Import a CSV file
-- [ ] Rank the proposals using Majority Judgment
-- [ ] Localization

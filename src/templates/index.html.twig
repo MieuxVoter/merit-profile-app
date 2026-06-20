@@ -1,35 +1,35 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
-    <h1>Merit Profile Renderer</h1>
+    <h1>{{ 'AppTitle'|t }}</h1>
 
     <form action="merit.svg" method="get">
 
         <fieldset>
-            <label title="If checked, the generated merit profiles will be sorted from highest to lowest.">
+            <label title="{{ 'SettingRankWithMjTitle'|t }}">
                 <input type="checkbox" name="mj">
-                Rank using Majority Judgment
+                {{ 'SettingRankWithMjLabel'|t }}
             </label>
             <br>
-            <label title="By default, this tool expects grades amounts from the lowest grade to the highest grade.  If checked, the order of the input grades amounts is reversed.">
+            <label title="{{ 'SettingHighToLowTitle'|t }}">
                 <input type="checkbox" name="h2l">
-                Highest Grade on the Left
+                {{ 'SettingHighToLowLabel'|t }}
             </label>
         </fieldset>
 
         {% for i in 0..placeholderNames|length-1 %}
         <fieldset class="proposal">
             <input type="text" name="n"
-                   title="Name of the proposal #{{ i }}"
+                   title="{{ 'FieldProposalNameTitle'|t(i) }}"
                    placeholder="{{ placeholderNames[i] }}"
                    maxlength="32">
             <input type="text" name="t" {% if loop.first %}required{% endif %}
                    placeholder="4,12,0,9,5,1,7"
                    pattern="\s*\d+\s*(\s*,\s*\d+\s*)*"
-                   title="Tally of the grades received by the proposal #{{ i }}, from lowest (worst) grade to highest (best) grade, separated by commas (,)">
+                   title="{{ 'FieldProposalTallyTitle'|t(i) }}">
         </fieldset>
         {% endfor %}
 
-        <input type="submit" value="Generate">
+        <input type="submit" value="{{ 'ActionGenerate'|t }}">
     </form>
 {% endblock %}

@@ -1,0 +1,32 @@
+[AppTitle]
+other = "Merit Profile Renderer"
+
+[ActionGenerate]
+other = "Generate"
+
+[SettingRankWithMjLabel]
+other = "Rank using Majority Judgment"
+
+[SettingRankWithMjTitle]
+other = "If checked, the generated merit profiles will be sorted from highest to lowest."
+
+[SettingHighToLowLabel]
+other = "Highest Grade on the Left"
+
+[SettingHighToLowTitle]
+other = "By default, this tool expects grades amounts from the lowest grade to the highest grade.  If checked, the order of the input grades amounts is reversed."
+
+[FieldProposalNameTitle]
+other = "Name of the proposal #{{.Value0}}"
+
+[FieldProposalTallyTitle]
+other = "Tally of the grades received by the proposal #{{.Value0}}, from lowest (worst) grade to highest (best) grade, separated by commas (,)"
+
+[ProposalNamePlaceholders]
+other = "Arancini,Burger,Chips,Dal,Empanadas,Fries,Gnocchis,Kale,Lasagna,Makis,Noodles,Oatmeal,Pizza,Rice,Soup,Tacos,Veggies"
+
+[ErrorTallyInconsistent]
+other = "The amount of grades for proposal #{{.Index}} ({{.Name}}) is {{.Amount}} which is different from {{.ExpectedAmount}}, the expected amount of grades.  Please make sure your tallies are consistent."
+
+[ErrorTallyImbalanced]
+other = "The total amount of judgments for proposal #{{.Index}} ({{.Name}}) is {{.Amount}} which is different from {{.ExpectedAmount}}, the expected amount of judgments.  Please make sure your tallies are balanced."

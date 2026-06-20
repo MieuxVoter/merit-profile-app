@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ language }}">
 <head>
     <meta charset="utf-8">
     <meta name="description" content="Generate merit profiles from tallies, and rank proposals using Majority Judgment.">
     <meta name="keywords" content="merit,poll,vote,majority,judgment,svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Merit Profile Renderer{% endblock %}</title>
+    <title>{% block title %}{{ 'AppTitle'|t }}{% endblock %}</title>
     <link rel="icon" sizes="256x256" href="/favicon.png">
 {% block style_base %}
     <link rel="stylesheet" media="all" href="/css/style.css">
