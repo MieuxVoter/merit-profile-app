@@ -66,12 +66,12 @@ func main() {
 			FS: templates.TemplatesFS,
 		},
 	)
-	err := templateEngine.Register(locales.LocalizationExtension{
+	twigErr := templateEngine.Register(locales.LocalizationExtension{
 		Localization: localization,
 		Localizers:   make(map[string]*locales.Localizer),
 	})
-	if err != nil {
-		panic(err)
+	if twigErr != nil {
+		panic(twigErr)
 	}
 
 	router := chi.NewRouter()
@@ -82,11 +82,11 @@ func main() {
 
 		userAcceptedLanguages := goacceptlanguageparser.ParseAcceptLanguage(
 			r.Header.Get("Accept-Language"),
-			[]string{"en", "fr"}, // TODO: handle the list of supported languages
+			localization.Languages,
 		)
-		language := "en"
+		userLanguage := localization.DefaultLanguage
 		if len(userAcceptedLanguages) > 0 {
-			language = userAcceptedLanguages[0]
+			userLanguage = userAcceptedLanguages[0]
 		}
 
 		err := templateEngine.Execute(
@@ -95,15 +95,21 @@ func main() {
 			map[string]stick.Value{
 				"placeholderNames": placeholderNames,
 				"version":          version.GetVersion(),
-				"language":         language,
+				"language":         userLanguage,
 			},
 		)
 		if err != nil {
 			handleServerError(err, w)
+			return
 		}
 	})
 
 	router.Get("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
+
+		localizer := localization.NewLocalizer(
+			r.Header.Get("Accept-Language"),
+			localization.DefaultLanguage,
+		)
 
 		query := r.URL.Query()
 		queryProposals := query["n"]
@@ -173,24 +179,28 @@ func main() {
 			}
 
 			if currentAmountOfGrades != amountOfGrades {
-				err := errors.New(fmt.Sprintf(
-					"The amount of grades for proposal #%d (%s) is %d which is different from %d, the expected amount of grades.  Please make sure your tallies are consistent.",
-					i,
-					proposalsNames[i],
-					currentAmountOfGrades,
-					amountOfGrades,
+				err := errors.New(localizer.Tf(
+					"ErrorTallyInconsistent",
+					map[string]interface{}{
+						"Index":          i,
+						"Name":           proposalsNames[i],
+						"Amount":         currentAmountOfGrades,
+						"ExpectedAmount": amountOfGrades,
+					},
 				))
 				handleUserError(err, w)
 				return
 			}
 
 			if currentAmountOfJudges != amountOfJudges {
-				err := errors.New(fmt.Sprintf(
-					"The total amount of judgments for proposal #%d (%s) is %d which is different from %d, the expected amount of judgments.  Please make sure your tallies are balanced.",
-					i,
-					proposalsNames[i],
-					currentAmountOfJudges,
-					amountOfJudges,
+				err := errors.New(localizer.Tf(
+					"ErrorTallyUnbalanced",
+					map[string]interface{}{
+						"Index":          i,
+						"Name":           proposalsNames[i],
+						"Amount":         currentAmountOfJudges,
+						"ExpectedAmount": amountOfJudges,
+					},
 				))
 				handleUserError(err, w)
 				return
@@ -206,14 +216,16 @@ func main() {
 		// We will never have to balance, since we do a balance check above, but safe > sorry.
 		balanceErr := pollTally.BalanceWithStaticDefault(0)
 		if balanceErr != nil {
+			handleServerError(balanceErr, w)
 			return
 		}
 
 		// Rule: proposals may be ranked in the merit profile
 		// We compute the rank even if we do not use it.  I'm okay with this, it's cheap.
 		deliberator := &judgment.MajorityJudgment{}
-		pollResult, err := deliberator.Deliberate(pollTally)
-		if err != nil {
+		pollResult, deliberationErr := deliberator.Deliberate(pollTally)
+		if deliberationErr != nil {
+			handleServerError(deliberationErr, w)
 			return
 		}
 
@@ -241,12 +253,13 @@ func main() {
 			merit.WithBestGradeOnLeft(bestOnTheLeft),
 			merit.WithWidth(980),
 		}
-		svg, err := merit.RenderLinearProfileSVG(
+		svg, renderErr := merit.RenderLinearProfileSVG(
 			meritProposals,
 			renderOptions...,
 		)
-		if err != nil {
-			handleServerError(err, w)
+		if renderErr != nil {
+			handleServerError(renderErr, w)
+			return
 		}
 
 		w.Header().Add("Content-Type", "image/svg+xml")

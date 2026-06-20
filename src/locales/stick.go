@@ -5,16 +5,20 @@ import (
 	"github.com/tyler-sommer/stick"
 )
 
+// LocalizationExtension implements stick.Extension to add localization utilities
 type LocalizationExtension struct {
 	Localization *Localization
 	Localizers   map[string]*Localizer // memoization of localizers
 }
 
+// Init is the main API of stick.Extension
 func (l LocalizationExtension) Init(e *stick.Env) error {
 	e.Filters["t"] = FilterTranslateFactory(l)
+	e.Filters["trans"] = FilterTranslateFactory(l)
 	return nil
 }
 
+// FindLocalizer helps finding a localizer for a language, using memoization
 func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
 	languageValue, languageFound := ctx.Scope().Get("language")
 	language := languageValue.(string)
@@ -24,7 +28,7 @@ func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
 
 	localizer, localizerFound := l.Localizers[language]
 	if !localizerFound {
-		localizer = l.Localization.GetLocalizer(
+		localizer = l.Localization.NewLocalizer(
 			language,
 			l.Localization.DefaultLanguage,
 		)
@@ -34,6 +38,7 @@ func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
 	return localizer
 }
 
+// FilterTranslateFactory allows our filter function to access the Localization instance.
 func FilterTranslateFactory(
 	l LocalizationExtension,
 ) func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {

@@ -21,3 +21,9 @@ other = "Nom de la proposition #{{.Value0}}"
 
 [FieldProposalTallyTitle]
 other = "Décomptes des mentions reçues par la proposition #{{.Value0}}, de la plus basse (la \"pire\") vers la plus haute (la \"meilleure\"), séparés par des virgules (,)"
+
+[ErrorTallyInconsistent]
+other = "Le nombre de mentions pour la proposition #{{.Index}} ({{.Name}}) est {{.Amount}} ce qui est différent de {{.ExpectedAmount}}, le nombre attendu de mentions.  Veuillez vérifier la structure de votre décompte."
+
+[ErrorTallyUnbalanced]
+other = "Le nombre total de jugements pour la proposition #{{.Index}} ({{.Name}}) est {{.Amount}} ce qui est différent de {{.ExpectedAmount}}, le total attendu de jugements.  Veuillez vérifier l'équilibrage de votre décompte."

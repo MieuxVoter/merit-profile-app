@@ -21,3 +21,9 @@ other = "Name of the proposal #{{.Value0}}"
 
 [FieldProposalTallyTitle]
 other = "Tally of the grades received by the proposal #{{.Value0}}, from lowest (worst) grade to highest (best) grade, separated by commas (,)"
+
+[ErrorTallyInconsistent]
+other = "The amount of grades for proposal #{{.Index}} ({{.Name}}) is {{.Amount}} which is different from {{.ExpectedAmount}}, the expected amount of grades.  Please make sure your tallies are consistent."
+
+[ErrorTallyUnbalanced]
+other = "The total amount of judgments for proposal #{{.Index}} ({{.Name}}) is {{.Amount}} which is different from {{.ExpectedAmount}}, the expected amount of judgments.  Please make sure your tallies are balanced."
