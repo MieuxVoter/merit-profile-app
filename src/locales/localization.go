@@ -46,7 +46,8 @@ func (l *Localization) Init(defaultLanguage language.Tag) {
 	l.DefaultLanguage = l.Languages[0]
 }
 
-// NewLocalizer creates a new localizer for the given languages.
+// NewLocalizer creates a new Localizer for the given languages.
+// Note that the HTTP header "Accept-Language" format is allowed.
 func (l *Localization) NewLocalizer(languages ...string) *Localizer {
 	return &Localizer{
 		logger:    l.Logger,
@@ -54,6 +55,9 @@ func (l *Localization) NewLocalizer(languages ...string) *Localizer {
 	}
 }
 
+// NewLocalizerAndLanguage creates a new Localizer for the given languages.
+// It also returns the principal language of the Localizer.
+// Note that the HTTP header "Accept-Language" format is allowed.
 func (l *Localization) NewLocalizerAndLanguage(
 	polyglotKey string, // make sure this translation key is defined in ALL available languages
 	languages ...string,

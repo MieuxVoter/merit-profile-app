@@ -38,7 +38,7 @@ func (l LocalizationExtension) FindLocalizer(ctx stick.Context) *Localizer {
 	return localizer
 }
 
-// FilterTranslateFactory allows our filter function to access the Localization instance.
+// FilterTranslateFactory allows our filter function to access a hoisted Localization instance.
 func FilterTranslateFactory(
 	l LocalizationExtension,
 ) func(ctx stick.Context, val stick.Value, args ...stick.Value) stick.Value {
