@@ -9,7 +9,6 @@ require (
 	github.com/mieuxvoter/majority-judgment-library-go v0.3.3
 	github.com/mieuxvoter/merit-profile-library-go v1.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
-	github.com/strukturag/goacceptlanguageparser v0.0.0-20160314151936-7224a0cc2c17
 	github.com/tyler-sommer/stick v1.0.10
 	golang.org/x/text v0.32.0
 )
