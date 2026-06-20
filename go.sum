@@ -2,6 +2,8 @@ github.com/BurntSushi/toml v1.6.0 h1:dRaEfpa2VI55EwlIW72hMRHdWouJeRF7TPYhI+AUQjk
 github.com/BurntSushi/toml v1.6.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/ajstarks/gensvg v0.0.0-20210923152200-4042c242e95e h1:450GYH87+/+YEC6/RRshDbWgm3uzl5U8SOdOoDl+gaw=
 github.com/ajstarks/gensvg v0.0.0-20210923152200-4042c242e95e/go.mod h1:PtU6ofchbU0VxGlg+klpebsi0DY7V9GrxtYeMJkWutM=
+github.com/csimplestring/go-csv v0.0.0-20180328183906-5b8b3cd94f2c h1:GwqiOoo1VZspAInyjqfrtLlpyp4EHh7E22s0auYZ26g=
+github.com/csimplestring/go-csv v0.0.0-20180328183906-5b8b3cd94f2c/go.mod h1:1vw0DCCXA4OaVQgLu1qoz/SQuTgCBpvUxPFSbdcyx+k=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-chi/chi/v5 v5.3.0 h1:halUjDxhshgXHMrao5bB8eNBXo/rnzwr8m5m36glehM=
@@ -24,8 +26,6 @@ github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFR
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/strukturag/goacceptlanguageparser v0.0.0-20160314151936-7224a0cc2c17 h1:lQoLsOmKF4O/Qq7J0gNgOncmv14rweRM8B0Y2Nu921I=
-github.com/strukturag/goacceptlanguageparser v0.0.0-20160314151936-7224a0cc2c17/go.mod h1:7Lni2gMAfES8RZSGt6VOrRHC2ZDQa0xazX0d4/TQDkc=
 github.com/tyler-sommer/stick v1.0.10 h1:VlXTvaxXnOtfkoTxqy+FWRM0OdN7sGX8Nfh8t2I1GSI=
 github.com/tyler-sommer/stick v1.0.10/go.mod h1:CYdsPuvxGEU32yi4ZTDul+55R8oS8/aHuWSppEq01B8=
 go.yaml.in/yaml/v3 v3.0.4 h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=
