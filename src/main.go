@@ -13,11 +13,13 @@ import (
 	"github.com/tyler-sommer/stick"
 	"github.com/tyler-sommer/stick/twig"
 	"golang.org/x/text/language"
+	"io"
 	"log/slog"
 	"main/src/input"
 	"main/src/locales"
 	"main/src/templates"
 	"main/src/version"
+	"math"
 	"net/http"
 	"os"
 	"slices"
@@ -25,7 +27,7 @@ import (
 )
 
 // polyglotKey MUST be defined in all available language files.
-// We use it as a bit of a workaround to detect the user's language.
+// We use it as a bit of a workaround to detect a usable language for the user.
 var polyglotKey = "AppTitle"
 
 func main() {
@@ -70,13 +72,17 @@ func main() {
 
 		placeholderNames := getPlaceholderNames(localizer)
 
+		query := r.URL.Query()
+		useCsv := len(query["csv"]) > 0
+
 		err := templateEngine.Execute(
-			"index.html.twig",
+			"form.html.twig",
 			w,
 			map[string]stick.Value{
 				"placeholderNames": placeholderNames,
 				"version":          version.GetVersion(),
 				"language":         userLanguage.String(),
+				"useCsv":           useCsv,
 			},
 		)
 		if err != nil {
@@ -85,100 +91,69 @@ func main() {
 		}
 	})
 
-	router.Get("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
-
+	meritHandler := func(
+		w http.ResponseWriter,
+		r *http.Request,
+		proposalsNames []string,
+		proposalsTallies []*judgment.ProposalTally,
+		bestOnTheLeft bool,
+		doSortWithMj bool,
+	) {
 		localizer, _ := localization.NewLocalizerAndLanguage(
 			polyglotKey,
 			r.Header.Get("Accept-Language"),
 		)
 
-		placeholderNames := getPlaceholderNames(localizer)
-
-		query := r.URL.Query()
-		queryProposals := query["n"]
-		queryTalliesAsStrings := query["t"]
-		queryHighToLow := query["h2l"]
-		querySortWithMj := query["mj"]
-
-		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
-		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
-
-		amountOfPossibleProposals := len(queryTalliesAsStrings)
-
-		proposalsNames := make([]string, 0)
-		proposalsTallies := make([]*judgment.ProposalTally, 0)
-		for i := range amountOfPossibleProposals {
-			proposalName := placeholderNames[i%len(placeholderNames)]
-			if i < len(queryProposals) {
-				if queryProposals[i] != "" {
-					proposalName = queryProposals[i]
-				}
-			}
-
-			queryTallyString := strings.TrimSpace(queryTalliesAsStrings[i])
-			if queryTallyString == "" {
-				continue
-			}
-
-			queryTally, err := input.DeserializeTally(queryTallyString)
-			if err != nil {
-				handleUserError(err, w)
-				return
-			}
-			if bestOnTheLeft {
-				slices.Reverse(queryTally)
-			}
-
-			if 0 < len(queryTally) {
-				tally := &judgment.ProposalTally{
-					Tally: queryTally,
-				}
-				proposalsNames = append(proposalsNames, proposalName)
-				proposalsTallies = append(proposalsTallies, tally)
-			}
-		}
-
+		//placeholderNames := getPlaceholderNames(localizer)
 		amountOfProposals := len(proposalsNames)
 
 		// Consistency and balance check, since input comes straight from userland
 		amountOfJudges := uint64(0)
 		amountOfGrades := 0
+		amountsOfJudges := make([]uint64, amountOfProposals)
+		amountsOfGrades := make([]int, amountOfProposals)
+
 		for i := range amountOfProposals {
 			currentAmountOfGrades := len(proposalsTallies[i].Tally)
 			currentAmountOfJudges := uint64(0)
 			for _, t := range proposalsTallies[i].Tally {
 				currentAmountOfJudges += t
 			}
+			amountsOfJudges[i] = currentAmountOfJudges
+			amountsOfGrades[i] = currentAmountOfGrades
 			if i == 0 {
 				amountOfGrades = currentAmountOfGrades
 				amountOfJudges = currentAmountOfJudges
-				continue
 			}
+		}
 
-			if currentAmountOfGrades != amountOfGrades {
-				err := errors.New(localizer.Tf(
-					"ErrorTallyInconsistent",
-					map[string]interface{}{
-						"Index":          i,
-						"Name":           proposalsNames[i],
-						"Amount":         currentAmountOfGrades,
-						"ExpectedAmount": amountOfGrades,
-					},
-				))
+		for i := range amountOfProposals {
+			if amountsOfGrades[i] != amountOfGrades {
+				msg := localizer.T("ErrorTallyInconsistent")
+				for j := range amountOfProposals {
+					msg += fmt.Sprintf(
+						"\n%s: %d %s",
+						proposalsNames[j],
+						amountsOfGrades[j],
+						localizer.Tp("Grade", amountsOfGrades[j]),
+					)
+				}
+				err := errors.New(msg)
 				handleUserError(err, w)
 				return
 			}
 
-			if currentAmountOfJudges != amountOfJudges {
-				err := errors.New(localizer.Tf(
-					"ErrorTallyImbalanced",
-					map[string]interface{}{
-						"Index":          i,
-						"Name":           proposalsNames[i],
-						"Amount":         currentAmountOfJudges,
-						"ExpectedAmount": amountOfJudges,
-					},
-				))
+			if amountsOfJudges[i] != amountOfJudges {
+				msg := localizer.T("ErrorTallyImbalanced")
+				for j := range amountOfProposals {
+					msg += fmt.Sprintf(
+						"\n%s: %d %s",
+						proposalsNames[j],
+						amountsOfJudges[j],
+						localizer.Tp("Judgment", int(amountsOfJudges[j])),
+					)
+				}
+				err := errors.New(msg)
 				handleUserError(err, w)
 				return
 			}
@@ -241,6 +216,156 @@ func main() {
 
 		w.Header().Add("Content-Type", "image/svg+xml")
 		_, _ = w.Write([]byte(svg))
+	}
+
+	router.Get("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
+		localizer, _ := localization.NewLocalizerAndLanguage(
+			polyglotKey,
+			r.Header.Get("Accept-Language"),
+		)
+
+		placeholderNames := getPlaceholderNames(localizer)
+
+		query := r.URL.Query()
+		queryProposals := query["n"]
+		queryTalliesAsStrings := query["t"]
+		queryHighToLow := query["h2l"]
+		querySortWithMj := query["mj"]
+
+		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
+		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
+
+		amountOfPossibleProposals := len(queryTalliesAsStrings)
+
+		proposalsNames := make([]string, 0)
+		proposalsTallies := make([]*judgment.ProposalTally, 0)
+		for i := range amountOfPossibleProposals {
+			proposalName := placeholderNames[i%len(placeholderNames)]
+			if i < len(queryProposals) {
+				if queryProposals[i] != "" {
+					proposalName = queryProposals[i]
+				}
+			}
+
+			queryTallyString := strings.TrimSpace(queryTalliesAsStrings[i])
+			if queryTallyString == "" {
+				continue
+			}
+
+			queryTally, err := input.DeserializeTally(queryTallyString)
+			if err != nil {
+				handleUserError(err, w)
+				return
+			}
+			if bestOnTheLeft {
+				slices.Reverse(queryTally)
+			}
+
+			if 0 < len(queryTally) {
+				tally := &judgment.ProposalTally{
+					Tally: queryTally,
+				}
+				proposalsNames = append(proposalsNames, proposalName)
+				proposalsTallies = append(proposalsTallies, tally)
+			}
+		}
+
+		meritHandler(
+			w,
+			r,
+			proposalsNames,
+			proposalsTallies,
+			bestOnTheLeft,
+			doSortWithMj,
+		)
+	})
+
+	router.Post("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
+		localizer, _ := localization.NewLocalizerAndLanguage(
+			polyglotKey,
+			r.Header.Get("Accept-Language"),
+		)
+
+		parseErr := r.ParseMultipartForm(2048)
+		if parseErr != nil {
+			handleUserError(parseErr, w)
+			return
+		}
+
+		queryHighToLow := r.MultipartForm.Value["h2l"]
+		querySortWithMj := r.MultipartForm.Value["mj"]
+
+		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
+		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
+
+		//w.Write([]byte(fmt.Sprintf("MultipartForm.Value: %v\n", r.MultipartForm.Value)))
+		//w.Write([]byte(fmt.Sprintf("MultipartForm.File: %v\n", r.MultipartForm.File)))
+		//w.Write([]byte(fmt.Sprintf("Form: %v\n", r.Form)))
+		//w.Write([]byte(fmt.Sprintf("PostForm: %v\n", r.PostForm)))
+		//w.Write([]byte(fmt.Sprintf("URL.Query(): %v\n", r.URL.Query().Encode())))
+
+		f, foundFile := r.MultipartForm.File["csv"]
+		if !foundFile {
+			err := errors.New(localizer.T("ErrorNoCsvFile"))
+			handleUserError(err, w)
+			return
+		}
+		if len(f) == 0 {
+			err := errors.New("file not found either")
+			handleUserError(err, w)
+			return
+		}
+
+		handle, openErr := f[0].Open()
+		if openErr != nil {
+			handleServerError(openErr, w)
+			return
+		}
+
+		fileHandle, fileHandleMarshallOk := handle.(io.Reader)
+		if !fileHandleMarshallOk {
+			handleServerError(errors.New("file handle marshall error"), w)
+			return
+		}
+
+		pr := input.ProfilesCsvReader{}
+		tallies, proposals, _, csvErr := pr.Read(&fileHandle, !bestOnTheLeft)
+		if csvErr != nil {
+			handleUserError(csvErr, w)
+			return
+		}
+
+		proposalsNames := make([]string, 0)
+		proposalsTallies := make([]*judgment.ProposalTally, 0)
+
+		// To handle float values in the CSV file (eg: from normalized tallies), we multiply them.
+		coefficient := 1.0
+		for i := range tallies {
+			for j := range tallies[i] {
+				coefficient = math.Max(coefficient, detectCoefficientToInt(tallies[i][j]))
+			}
+		}
+
+		for i := range tallies {
+			proposalsNames = append(proposalsNames, proposals[i])
+			uint64Tally := make([]uint64, len(tallies[i]))
+			for j, t := range tallies[i] {
+				uint64Tally[j] = uint64(coefficient * t)
+			}
+			tally := &judgment.ProposalTally{
+				Tally: uint64Tally,
+			}
+			proposalsTallies = append(proposalsTallies, tally)
+		}
+
+		meritHandler(
+			w,
+			r,
+			proposalsNames,
+			proposalsTallies,
+			bestOnTheLeft,
+			doSortWithMj,
+		)
 	})
 
 	// We also want to serve some static files, like CSS and the favicon
@@ -285,4 +410,17 @@ func readAsCsvSlice(localizer *locales.Localizer, key string) []string {
 		placeholderNames[i] = strings.TrimSpace(placeholderNames[i])
 	}
 	return placeholderNames
+}
+
+// detectCoefficientToInt returns by how much we must multiply the input to get an integer
+// without losing precision.  We stop at one million max (gotta stop *somewhere*).
+func detectCoefficientToInt(value float64) float64 {
+	p := 1.0
+	for p < 1000000.0 {
+		if math.Floor(value*p) == (value * p) {
+			break
+		}
+		p *= 10.0
+	}
+	return p
 }

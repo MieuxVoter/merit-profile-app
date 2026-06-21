@@ -4,15 +4,33 @@
 [![Release](https://img.shields.io/github/v/release/MieuxVoter/merit-profile-app?include_prereleases&style=for-the-badge)](https://github.com/MieuxVoter/merit-profile-app/releases)
 [![Discord Chat https://discord.gg/k9YRuZPSZs](https://img.shields.io/discord/705322981102190593.svg?style=for-the-badge)](https://discord.gg/k9YRuZPSZs)
 
-A web app that generates merit profiles from tallies.
+A web app that renders merit profiles from tallies.
 
 Try it out at https://educ.mieuxvoter.fr
 
-## Roadmap
 
+## Features
+
+- [x] Output pretty and readable SVG
 - [x] Enter the tallies by hand using a form
-- [x] Docker configuration for deployment
+- [x] Import a CSV file
 - [x] Support static files (for favicon, CSS…)
 - [x] Rank the proposals using Majority Judgment
+- [ ] Balance tallies
 - [x] Localization
-- [ ] Import a CSV file
+- [x] Docker configuration for deployment
+
+
+## Run locally
+
+```shell
+make build && build/mpa
+```
+
+or, using Docker:
+
+```shell
+make start
+```
+
+Then, visit http://localhost:8033

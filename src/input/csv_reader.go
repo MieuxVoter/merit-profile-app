@@ -1,0 +1,245 @@
+// SPDX-License-Identifier: Apache-2.0
+
+package input
+
+import (
+	"encoding/csv"
+	"errors"
+	"fmt"
+	"github.com/csimplestring/go-csv/detector"
+	"io"
+	"regexp"
+	"strconv"
+	"strings"
+)
+
+// ProfilesCsvReader reads a poll's tally in a CSV like so:
+//
+//	Nutriscore, G, F, E, D, C, B, A
+//	     Pizza, 4, 2, 3, 4, 5, 4, 1
+//	     Chips, 5, 3, 2, 4, 4, 3, 2
+//	     Pasta, 4, 4, 2, 4, 4, 3, 2
+type ProfilesCsvReader struct{}
+
+// Read the input CSV and return as much data as we can.
+func (r ProfilesCsvReader) Read(
+	input *io.Reader,
+	worstGradeToBestGrade bool,
+) (
+	tallies [][]float64,
+	proposals []string,
+	grades []string,
+	err error,
+) {
+	csvDelimiter := ',' // default value if our detector below fails
+	csvQuote := '"'
+
+	// I. Read the whole input at once.  Tried stream reading with io.Pipe but… buffer!
+	allDataBytes, _ := io.ReadAll(*input)
+	allData := SanitizeInput(string(allDataBytes))
+	inputReaderForMeta := strings.NewReader(allData)
+	inputReaderForData := strings.NewReader(allData)
+
+	// I.a Detect the delimiter between values in the input
+	delimiterDetector := detector.New()
+	delimiters := delimiterDetector.DetectDelimiter(inputReaderForMeta, byte(csvQuote))
+	if 0 < len(delimiters) {
+		csvDelimiter = ReadFirstRune(delimiters[0])
+	}
+	if 1 < len(delimiters) {
+		err = fmt.Errorf("too many delimiters: found `%s` and `%s`", delimiters[0], delimiters[1])
+		return
+	}
+
+	// I.b Read the actual CSV contents
+	csvReader := csv.NewReader(inputReaderForData)
+	csvReader.Comma = csvDelimiter
+	csvRows, errReader := csvReader.ReadAll()
+	if errReader != nil {
+		err = errors.New("Failed to read input CSV: " + errReader.Error())
+		return
+	}
+
+	// II. Detect the shape/structure of the input file
+	hasGradesNamesRow, hasProposalNamesColumn := r.detectShape(csvRows)
+
+	// III. Read the tallies, proposals, grades
+	for rowIndex, row := range csvRows {
+		rowLen := len(row)
+		if rowLen < 2 {
+			continue
+		}
+
+		// III.a Read the grades names on the first row, or generate some if missing
+		if 0 == rowIndex {
+			if hasGradesNamesRow {
+				grades = ReadNamesRow(row[:], hasProposalNamesColumn)
+			} else {
+				var errGradesGen error
+				if hasProposalNamesColumn {
+					grades, errGradesGen = GenerateDummyGradeNames(rowLen - 1)
+				} else {
+					grades, errGradesGen = GenerateDummyGradeNames(rowLen)
+				}
+				if nil != errGradesGen {
+					err = errors.New("Failed to generate default grades names: " + errGradesGen.Error())
+					return
+				}
+			}
+			if !worstGradeToBestGrade {
+				//slices.Reverse(grades)
+				for i, j := 0, len(grades)-1; i < j; i, j = i+1, j-1 {
+					grades[i], grades[j] = grades[j], grades[i]
+				}
+			}
+		}
+
+		if rowIndex > 0 || !hasGradesNamesRow {
+			// III.b Read the proposals' names
+			if hasProposalNamesColumn {
+				proposals = append(proposals, strings.TrimSpace(row[0]))
+			} else {
+				j := len(proposals)
+				proposals = append(proposals, "Proposal "+alphabet[j:j+1])
+			}
+
+			// III.c Read the actual tallies
+			proposalTallyOfFloats, tallyErr := ReadTallyRow(row, hasProposalNamesColumn)
+			if nil != tallyErr {
+				err = errors.New("Failed to read input tally: " + tallyErr.Error())
+				return
+			}
+			if !worstGradeToBestGrade {
+				//slices.Reverse(proposalTallyOfFloats)
+				for i, j := 0, len(proposalTallyOfFloats)-1; i < j; i, j = i+1, j-1 {
+					proposalTallyOfFloats[i], proposalTallyOfFloats[j] = proposalTallyOfFloats[j], proposalTallyOfFloats[i]
+				}
+			}
+			tallies = append(tallies, proposalTallyOfFloats)
+		}
+	}
+
+	return
+}
+
+// detectShape gathers metadata about the CSV structure
+func (r ProfilesCsvReader) detectShape(rows [][]string) (hasGradesNamesRow bool, hasProposalNamesColumn bool) {
+	hasGradesNamesRow = false
+	hasProposalNamesColumn = false
+
+	for rowIndex, row := range rows {
+		if rowIndex == 0 {
+			for i := len(row) - 1; i >= 1; i-- {
+				if "" == strings.TrimSpace(row[i]) {
+					continue
+				}
+				_, errDetection := ReadNumber(row[i])
+				if errDetection != nil {
+					hasGradesNamesRow = true
+					break
+				}
+			}
+		}
+
+		if !hasGradesNamesRow || 0 != rowIndex {
+			if "" == strings.TrimSpace(row[0]) {
+				continue
+			}
+			_, errDetection := ReadNumber(row[0])
+			if errDetection != nil {
+				hasProposalNamesColumn = true
+			}
+		}
+	}
+
+	return
+}
+
+// SanitizeInput to help readers
+func SanitizeInput(input string) string {
+	sanitized := input // inefficient, but makes code below more modular — TBD
+
+	// Remove duplicate spaces
+	sanitized = regexp.MustCompile(`  +`).ReplaceAllString(sanitized, " ")
+
+	// Remove Carriage Return (CRLF into LF)
+	sanitized = regexp.MustCompile(`\r\n`).ReplaceAllString(sanitized, "\n")
+
+	// …
+
+	return sanitized
+}
+
+// ReadTallyRow reads a proposal tally row from strings
+func ReadTallyRow(row []string, skipFirst bool) ([]float64, error) {
+	tallies := make([]float64, 0, 7)
+	for colIndex, gradeTally := range row {
+		if skipFirst && colIndex == 0 {
+			continue
+		}
+		gradeTallyFloat, err := ReadNumber(gradeTally)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read `%s` as number: %s", gradeTally, err.Error())
+		}
+		if gradeTallyFloat < 0 {
+			return nil, fmt.Errorf("strictly negative numbers are not allowed, but got `%s`", gradeTally)
+		}
+		tallies = append(tallies, gradeTallyFloat)
+	}
+
+	return tallies, nil
+}
+
+// ReadNamesRow reads a bunch of names as strings
+func ReadNamesRow(row []string, skipFirst bool) (names []string) {
+	names = make([]string, 0, 10)
+	for i, name := range row {
+		if skipFirst && 0 == i {
+			continue
+		}
+		names = append(names, strings.TrimSpace(name))
+	}
+
+	return names
+}
+
+// ReadNumber reads the number from the input string.
+func ReadNumber(s string) (n float64, err error) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return 0.0, nil
+	}
+	return strconv.ParseFloat(s, 64)
+}
+
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
+// GenerateDummyGradeNames generates dummy grade names in reverse alphabetical order
+func GenerateDummyGradeNames(thatMany int) (grades []string, err error) {
+	if thatMany < 0 {
+		err = fmt.Errorf("cannot generate negative amounts of grades (tried %d)", thatMany)
+		return
+	}
+	if thatMany > len(alphabet) {
+		err = fmt.Errorf("no more than %d different grades can be generated (tried %d)", len(alphabet), thatMany)
+		return
+	}
+	grades = strings.Split(alphabet[0:thatMany], "")
+	for i, j := 0, thatMany-1; i < j; i, j = i+1, j-1 {
+		grades[i], grades[j] = grades[j], grades[i]
+	}
+	for i, grade := range grades {
+		grades[i] = fmt.Sprintf("Grade %s", grade)
+	}
+
+	return
+}
+
+// ReadFirstRune reads the first rune
+func ReadFirstRune(str string) (first rune) {
+	for _, someRune := range str {
+		first = someRune
+		break
+	}
+	return
+}

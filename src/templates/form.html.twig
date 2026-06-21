@@ -1,0 +1,55 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>{{ 'AppTitle'|t }}</h1>
+    <form action="merit.svg"
+    {% if useCsv %}
+          method="post" enctype="multipart/form-data"
+    {% else %}
+          method="get"
+    {% endif %}
+        >
+
+        {% if useCsv %}
+        <p>
+            Upload a CSV below or <a href="/">directly provide the tallies</a> instead.
+        </p>
+        <fieldset class="upload">
+            <label>
+                {{ 'FieldCsvFileLabel'|t }}&nbsp;&nbsp;&nbsp;
+                <input type="file" name="csv" accept="text/csv" required>
+            </label>
+        </fieldset>
+        {% else %}
+        <p>
+            Provide the tallies below or <a href="/?csv">upload a CSV file</a> instead.
+        </p>
+        {% for i in 0..placeholderNames|length-1 %}
+        <fieldset class="proposal">
+            <input type="text" name="n"
+                   title="{{ 'FieldProposalNameTitle'|t(i) }}"
+                   placeholder="{{ placeholderNames[i] }}"
+                   maxlength="32">
+            <input type="text" name="t" {% if loop.first %}required{% endif %}
+                   placeholder="4,12,0,9,5,1,7"
+                   pattern="\s*\d+\s*(\s*,\s*\d+\s*)*"
+                   title="{{ 'FieldProposalTallyTitle'|t(i) }}">
+        </fieldset>
+        {% endfor %}
+        {% endif %}
+
+        <fieldset>
+            <label title="{{ 'SettingRankWithMjTitle'|t }}">
+                <input type="checkbox" name="mj">
+                {{ 'SettingRankWithMjLabel'|t }}
+            </label>
+            <br>
+            <label title="{{ 'SettingHighToLowTitle'|t }}">
+                <input type="checkbox" name="h2l">
+                {{ 'SettingHighToLowLabel'|t }}
+            </label>
+        </fieldset>
+
+        <input type="submit" value="{{ 'ActionGenerate'|t }}">
+    </form>
+{% endblock %}
