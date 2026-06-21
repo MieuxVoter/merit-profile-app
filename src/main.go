@@ -107,48 +107,55 @@ func main() {
 		)
 
 		//placeholderNames := getPlaceholderNames(localizer)
-
 		amountOfProposals := len(proposalsNames)
 
 		// Consistency and balance check, since input comes straight from userland
 		amountOfJudges := uint64(0)
 		amountOfGrades := 0
+		amountsOfJudges := make([]uint64, amountOfProposals)
+		amountsOfGrades := make([]int, amountOfProposals)
+
 		for i := range amountOfProposals {
 			currentAmountOfGrades := len(proposalsTallies[i].Tally)
 			currentAmountOfJudges := uint64(0)
 			for _, t := range proposalsTallies[i].Tally {
 				currentAmountOfJudges += t
 			}
+			amountsOfJudges[i] = currentAmountOfJudges
+			amountsOfGrades[i] = currentAmountOfGrades
 			if i == 0 {
 				amountOfGrades = currentAmountOfGrades
 				amountOfJudges = currentAmountOfJudges
-				continue
 			}
+		}
 
-			if currentAmountOfGrades != amountOfGrades {
-				err := errors.New(localizer.Tf(
-					"ErrorTallyInconsistent",
-					map[string]interface{}{
-						"Index":          i,
-						"Name":           proposalsNames[i],
-						"Amount":         currentAmountOfGrades,
-						"ExpectedAmount": amountOfGrades,
-					},
-				))
+		for i := range amountOfProposals {
+			if amountsOfGrades[i] != amountOfGrades {
+				msg := localizer.T("ErrorTallyInconsistent")
+				for j := range amountOfProposals {
+					msg += fmt.Sprintf(
+						"\n%s: %d %s",
+						proposalsNames[j],
+						amountsOfGrades[j],
+						localizer.Tp("Grade", amountsOfGrades[j]),
+					)
+				}
+				err := errors.New(msg)
 				handleUserError(err, w)
 				return
 			}
 
-			if currentAmountOfJudges != amountOfJudges {
-				err := errors.New(localizer.Tf(
-					"ErrorTallyImbalanced",
-					map[string]interface{}{
-						"Index":          i,
-						"Name":           proposalsNames[i],
-						"Amount":         currentAmountOfJudges,
-						"ExpectedAmount": amountOfJudges,
-					},
-				))
+			if amountsOfJudges[i] != amountOfJudges {
+				msg := localizer.T("ErrorTallyImbalanced")
+				for j := range amountOfProposals {
+					msg += fmt.Sprintf(
+						"\n%s: %d %s",
+						proposalsNames[j],
+						amountsOfJudges[j],
+						localizer.Tp("Judgment", int(amountsOfJudges[j])),
+					)
+				}
+				err := errors.New(msg)
 				handleUserError(err, w)
 				return
 			}
@@ -282,9 +289,6 @@ func main() {
 		//)
 		//placeholderNames := getPlaceholderNames(localizer)
 
-		//w.Write([]byte(queryCsv[0]))
-		//w.Write([]byte("\n"))
-
 		parseErr := r.ParseMultipartForm(1024)
 		if parseErr != nil {
 			handleUserError(parseErr, w)
@@ -302,7 +306,6 @@ func main() {
 		//w.Write([]byte(fmt.Sprintf("Form: %v\n", r.Form)))
 		//w.Write([]byte(fmt.Sprintf("PostForm: %v\n", r.PostForm)))
 		//w.Write([]byte(fmt.Sprintf("URL.Query(): %v\n", r.URL.Query().Encode())))
-		//w.Write([]byte(queryCsv[0]))
 
 		f, foundFile := r.MultipartForm.File["csv"]
 		if !foundFile {
