@@ -1,8 +1,8 @@
 :root {
-    --main-color: #3c3c3c;
-    --main-bg-color: #e3e3e3;
-    --main-color-dim: hsl(from var(--main-color) h s calc(l + 20));
-    --main-color-dimmer: hsl(from var(--main-color) h s calc(l + 40));
+    --main-color: #efefff;
+    --main-bg-color: #2400fd;
+    --main-color-dim: hsl(from var(--main-color) h s calc(l - 20));
+    --main-color-dimmer: hsl(from var(--main-color) h s calc(l - 40));
     --link-color: inherit;
     --link-visited-color: inherit;
     --link-hover-color: inherit;
@@ -10,10 +10,10 @@
 }
 @media screen and (prefers-color-scheme: dark) {
     :root {
-        --main-color: #e3e3e3;
-        --main-bg-color: #1c1c1c;
-        --main-color-dim: hsl(from var(--main-color) h s calc(l - 20));
-        --main-color-dimmer: hsl(from var(--main-color) h s calc(l - 40));
+        /*--main-color: #e3e3e3;*/
+        /*--main-bg-color: #1c1c1c;*/
+        /*--main-color-dim: hsl(from var(--main-color) h s calc(l - 20));*/
+        /*--main-color-dimmer: hsl(from var(--main-color) h s calc(l - 40));*/
     }
 }
 @media print {
@@ -26,6 +26,7 @@ body, textarea, input {
     color: var(--main-color);
     background-color: var(--main-bg-color);
     border-width: 1px;
+    font-family: sans-serif;
 }
 textarea {
     width: 100%;
@@ -38,10 +39,16 @@ fieldset {
     border-width: 1px;
     border-color: var(--main-color-dimmer);
 }
+h1, h2, h3, h4, h5, h6 {
+    font-family: "DM Serif Display",serif;
+}
 a:link { color: var(--link-color); }
 a:visited { color: var(--link-visited-color); }
 a:hover { color: var(--link-hover-color); }
 a:active { color: var(--link-active-color); }
+label {
+    cursor: pointer;
+}
 button[type=submit],
 input[type=submit] {
     margin: 1em auto;
@@ -49,7 +56,6 @@ input[type=submit] {
     cursor: pointer;
     border-radius: 0.5em;
 }
-
 ul.inline li {
     display: inline-flex;
 }

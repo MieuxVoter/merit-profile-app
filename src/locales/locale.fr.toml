@@ -47,6 +47,12 @@ other = "Décomptes des mentions reçues par la proposition #{{.Value0}}, de la 
 [FieldCsvFileLabel]
 other = "Téléverser un fichier CSV :"
 
+[FieldCsvFileInfo]
+other = "Votre fichier CSV devrait ressembler à ceci:"
+
+[FieldCsvFileInfoTitle]
+other = "Ce n'est qu'un exemple.  Votre fichier peut définir plusse de mentions (+ de colonnes), et bien sûr plusse de propositions (+ de lignes)."
+
 [ProposalNamePlaceholders]
 other = "Aligot,Bouillabaisse,Choucroute,Daube,Enchiladas,Frites,Gratin,Houmous,Lasagnes,Makis,Nouilles,Omelette,Pizza,Riz,Soupe,Tajine,Velouté"
 

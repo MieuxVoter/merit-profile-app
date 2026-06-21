@@ -20,6 +20,16 @@
                 {{ 'FieldCsvFileLabel'|t }}&nbsp;&nbsp;&nbsp;
                 <input type="file" name="csv" accept="text/csv" required>
             </label>
+            <div>
+                <p>
+                    {{ 'FieldCsvFileInfo'|t }}
+                </p>
+                <pre title="{{ 'FieldCsvFileInfoTitle'|t }}">
+candidate\grade, reject, passable, good, excellent
+pizza,                2,        3,    0,         7
+pasta,                3,        4,    2,         3
+bread,                4,        1,    4,         3</pre>
+            </div>
         </fieldset>
         {% else %}
         <p>
@@ -52,6 +62,6 @@
             </label>
         </fieldset>
 
-        <input type="submit" value="{{ 'ActionGenerate'|t }}">
+        <input type="submit" value="&#127912; {{ 'ActionGenerate'|t }}">
     </form>
 {% endblock %}

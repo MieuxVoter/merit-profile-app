@@ -47,6 +47,12 @@ other = "Tally of the grades received by the proposal #{{.Value0}}, from lowest 
 [FieldCsvFileLabel]
 other = "Upload a CSV file:"
 
+[FieldCsvFileInfo]
+other = "Your CSV file should look something like this:"
+
+[FieldCsvFileInfoTitle]
+other = "This is only an example.  Your file may have more grades (more columns), and of course more candidates (more rows)."
+
 [ProposalNamePlaceholders]
 other = "Arancini,Burger,Chips,Dal,Empanadas,Fries,Gnocchis,Kale,Lasagna,Makis,Noodles,Oatmeal,Pizza,Rice,Soup,Tacos,Veggies"
 

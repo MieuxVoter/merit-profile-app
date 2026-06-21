@@ -207,7 +207,7 @@ func main() {
 		}
 
 		renderOptions := []merit.RenderOptions{
-			merit.WithBestGradeOnLeft(bestOnTheLeft),
+			merit.WithBestGradeOnLeft(true),
 			merit.WithWidth(980),
 		}
 		if doSortWithMj {
