@@ -7,6 +7,7 @@ one = "judgment"
 other = "judgments"
 
 [Grade]
+zero = "grades"
 one = "grade"
 other = "grades"
 
@@ -31,6 +32,9 @@ other = "Name of the proposal #{{.Value0}}"
 [FieldProposalTallyTitle]
 other = "Tally of the grades received by the proposal #{{.Value0}}, from lowest (worst) grade to highest (best) grade, separated by commas (,)"
 
+[FieldCsvFileLabel]
+other = "Upload a CSV file:"
+
 [ProposalNamePlaceholders]
 other = "Arancini,Burger,Chips,Dal,Empanadas,Fries,Gnocchis,Kale,Lasagna,Makis,Noodles,Oatmeal,Pizza,Rice,Soup,Tacos,Veggies"
 
@@ -39,3 +43,6 @@ other = "The amount of grades is different amongst proposals.  Please make sure 
 
 [ErrorTallyImbalanced]
 other = "The total amount of judgments is different amongst proposals.  Please make sure your tallies are balanced."
+
+[ErrorNoCsvFile]
+other = "No CSV file was provided.  Please provide a CSV file."

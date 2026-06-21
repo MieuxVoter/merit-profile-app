@@ -1,6 +1,16 @@
 [AppTitle]
 other = "Visualisateur de Profils de Mérite"
 
+[Judgment]
+zero = "jugements"
+one = "jugement"
+other = "jugements"
+
+[Grade]
+zero = "mentions"
+one = "mention"
+other = "mentions"
+
 [ActionGenerate]
 other = "Générer"
 
@@ -22,11 +32,17 @@ other = "Nom de la proposition #{{.Value0}}"
 [FieldProposalTallyTitle]
 other = "Décomptes des mentions reçues par la proposition #{{.Value0}}, de la plus basse (la \"pire\") vers la plus haute (la \"meilleure\"), séparés par des virgules (,)"
 
+[FieldCsvFileLabel]
+other = "Téléverser un fichier CSV :"
+
 [ProposalNamePlaceholders]
 other = "Aligot,Bouillabaisse,Choucroute,Daube,Enchiladas,Frites,Gratin,Houmous,Lasagnes,Makis,Nouilles,Omelette,Pizza,Riz,Soupe,Tajine,Velouté"
 
 [ErrorTallyInconsistent]
-other = "Le nombre de mentions pour la proposition #{{.Index}} ({{.Name}}) est {{.Amount}}.  C'est différent de {{.ExpectedAmount}}, le nombre attendu de mentions.  Veuillez vérifier la structure de votre décompte."
+other = "Le nombre de mentions est différent entre les propositions.  Veuillez vérifier la structure de votre décompte."
 
 [ErrorTallyImbalanced]
-other = "Le nombre total de jugements pour la proposition #{{.Index}} ({{.Name}}) est {{.Amount}}. C'est différent de {{.ExpectedAmount}}, le total attendu de jugements.  Veuillez vérifier l'équilibrage de votre décompte."
+other = "Le nombre total de jugements est différent entre les propositions.  Veuillez vérifier l'équilibrage de votre décompte."
+
+[ErrorNoCsvFile]
+other = "No CSV file was provided.  Please provide a CSV file."

@@ -16,8 +16,8 @@
         </p>
         <fieldset class="upload">
             <label>
-                Upload a CSV file:&nbsp;&nbsp;&nbsp;
-                <input type="file" name="csv" accept="text/csv">
+                {{ 'FieldCsvFileLabel'|t }}&nbsp;&nbsp;&nbsp;
+                <input type="file" name="csv" accept="text/csv" required>
             </label>
         </fieldset>
         {% else %}

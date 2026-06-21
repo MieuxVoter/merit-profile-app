@@ -27,7 +27,7 @@ import (
 )
 
 // polyglotKey MUST be defined in all available language files.
-// We use it as a bit of a workaround to detect the user's language.
+// We use it as a bit of a workaround to detect a usable language for the user.
 var polyglotKey = "AppTitle"
 
 func main() {
@@ -99,8 +99,6 @@ func main() {
 		bestOnTheLeft bool,
 		doSortWithMj bool,
 	) {
-		//router.Get("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
-
 		localizer, _ := localization.NewLocalizerAndLanguage(
 			polyglotKey,
 			r.Header.Get("Accept-Language"),
@@ -281,15 +279,14 @@ func main() {
 			doSortWithMj,
 		)
 	})
+
 	router.Post("/merit.svg", func(w http.ResponseWriter, r *http.Request) {
+		localizer, _ := localization.NewLocalizerAndLanguage(
+			polyglotKey,
+			r.Header.Get("Accept-Language"),
+		)
 
-		//localizer, _ := localization.NewLocalizerAndLanguage(
-		//	polyglotKey,
-		//	r.Header.Get("Accept-Language"),
-		//)
-		//placeholderNames := getPlaceholderNames(localizer)
-
-		parseErr := r.ParseMultipartForm(1024)
+		parseErr := r.ParseMultipartForm(2048)
 		if parseErr != nil {
 			handleUserError(parseErr, w)
 			return
@@ -309,7 +306,7 @@ func main() {
 
 		f, foundFile := r.MultipartForm.File["csv"]
 		if !foundFile {
-			err := errors.New("file not found")
+			err := errors.New(localizer.T("ErrorNoCsvFile"))
 			handleUserError(err, w)
 			return
 		}
@@ -345,7 +342,7 @@ func main() {
 		coefficient := 1.0
 		for i := range tallies {
 			for j := range tallies[i] {
-				coefficient = math.Max(coefficient, detectPrecision(tallies[i][j]))
+				coefficient = math.Max(coefficient, detectCoefficientToInt(tallies[i][j]))
 			}
 		}
 
@@ -415,7 +412,9 @@ func readAsCsvSlice(localizer *locales.Localizer, key string) []string {
 	return placeholderNames
 }
 
-func detectPrecision(value float64) float64 {
+// detectCoefficientToInt returns by how much we must multiply the input to get an integer
+// without losing precision.  We stop at one million max (gotta stop *somewhere*).
+func detectCoefficientToInt(value float64) float64 {
 	p := 1.0
 	for p < 1000000.0 {
 		if math.Floor(value*p) == (value * p) {
