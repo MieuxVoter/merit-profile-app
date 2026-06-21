@@ -10,7 +10,7 @@ import (
 func CheckboxQueryToBool(queryParamValue []string) bool {
 	out := false
 	if len(queryParamValue) > 0 {
-		if queryParamValue[0] == "on" {
+		if queryParamValue[0] != "off" && queryParamValue[0] != "0" {
 			out = true
 		}
 	}
