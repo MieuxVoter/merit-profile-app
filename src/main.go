@@ -201,10 +201,19 @@ func main() {
 			}
 		}
 
+		gradesOutlines := make([][]int, amountOfProposals)
+		for i, proposal := range pollResult.ProposalsSorted {
+			gradesOutlines[i] = []int{int(proposal.Analysis.MedianGrade)}
+		}
+
 		renderOptions := []merit.RenderOptions{
 			merit.WithBestGradeOnLeft(bestOnTheLeft),
 			merit.WithWidth(980),
 		}
+		if doSortWithMj {
+			renderOptions = append(renderOptions, merit.WithGradesOutlines(gradesOutlines))
+		}
+
 		svg, renderErr := merit.RenderLinearProfileSVG(
 			meritProposals,
 			renderOptions...,
