@@ -33,7 +33,7 @@ other = "Rank using Majority Judgment"
 other = "If checked, the generated merit profiles will be sorted from highest to lowest."
 
 [SettingHighToLowLabel]
-other = "Highest Grade on the Left"
+other = "Read Highest Grade → Lowest Grade"
 
 [SettingHighToLowTitle]
 other = "By default, this tool expects grades amounts from the lowest grade to the highest grade.  If checked, the order of the input grades amounts is reversed."
