@@ -12,7 +12,8 @@
 
         {% if useCsv %}
         <p>
-            Upload a CSV below or <a href="/">directly provide the tallies</a> instead.
+            {# Upload a CSV below or <a href="/">directly provide the tallies</a> instead. #}
+            {{ 'InstructionUploadCsvFile'|t('<a href="/">' ~ 'LinkProvideTallies'|t ~ '</a>')|raw }}
         </p>
         <fieldset class="upload">
             <label>
@@ -22,18 +23,19 @@
         </fieldset>
         {% else %}
         <p>
-            Provide the tallies below or <a href="/?csv">upload a CSV file</a> instead.
+            {# Provide the tallies below or <a href="/?csv">upload a CSV file</a> instead.#}
+            {{ 'InstructionProvideTallies'|t('<a href="/?csv">' ~ 'LinkUploadCsvFile'|t ~ '</a>')|raw }}
         </p>
         {% for i in 0..placeholderNames|length-1 %}
         <fieldset class="proposal">
             <input type="text" name="n"
-                   title="{{ 'FieldProposalNameTitle'|t(i) }}"
+                   title="{{ 'FieldProposalNameTitle'|t(i+1) }}"
                    placeholder="{{ placeholderNames[i] }}"
                    maxlength="32">
             <input type="text" name="t" {% if loop.first %}required{% endif %}
                    placeholder="4,12,0,9,5,1,7"
                    pattern="\s*\d+\s*(\s*,\s*\d+\s*)*"
-                   title="{{ 'FieldProposalTallyTitle'|t(i) }}">
+                   title="{{ 'FieldProposalTallyTitle'|t(i+1) }}">
         </fieldset>
         {% endfor %}
         {% endif %}

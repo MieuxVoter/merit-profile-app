@@ -201,10 +201,19 @@ func main() {
 			}
 		}
 
+		gradesOutlines := make([][]int, amountOfProposals)
+		for i, proposal := range pollResult.ProposalsSorted {
+			gradesOutlines[i] = []int{int(proposal.Analysis.MedianGrade)}
+		}
+
 		renderOptions := []merit.RenderOptions{
 			merit.WithBestGradeOnLeft(bestOnTheLeft),
 			merit.WithWidth(980),
 		}
+		if doSortWithMj {
+			renderOptions = append(renderOptions, merit.WithGradesOutlines(gradesOutlines))
+		}
+
 		svg, renderErr := merit.RenderLinearProfileSVG(
 			meritProposals,
 			renderOptions...,
@@ -311,7 +320,7 @@ func main() {
 			return
 		}
 		if len(f) == 0 {
-			err := errors.New("file not found either")
+			err := errors.New("multipart file not found")
 			handleUserError(err, w)
 			return
 		}
@@ -391,6 +400,7 @@ func handleUserError(err error, writer http.ResponseWriter) {
 func loadDotEnv() {
 	err := godotenv.Load(".env.local")
 	if err != nil {
+		// It's okay, we do not actually *require* a local env, since we have no secrets.
 		//fmt.Println("No .env.local file found.  You may create one by copying .env.")
 	}
 	err = godotenv.Load() // .env
@@ -399,17 +409,18 @@ func loadDotEnv() {
 	}
 }
 
+// getPlaceholderNames grabs the slice of placeholder (proposal) names from the l10n files.
 func getPlaceholderNames(localizer *locales.Localizer) []string {
-	return readAsCsvSlice(localizer, "ProposalNamePlaceholders")
+	return readAsCsvSlice(localizer.T("ProposalNamePlaceholders"))
 }
 
-func readAsCsvSlice(localizer *locales.Localizer, key string) []string {
-	placeholderNamesString := localizer.T(key)
-	placeholderNames := strings.Split(placeholderNamesString, ",")
-	for i := range placeholderNames {
-		placeholderNames[i] = strings.TrimSpace(placeholderNames[i])
+// readAsCsvSlice reads a CSV line into a slice, with some whitespace cleaning, but without any type casting.
+func readAsCsvSlice(csvLine string) []string {
+	csvSlice := strings.Split(csvLine, ",")
+	for i := range csvSlice {
+		csvSlice[i] = strings.TrimSpace(csvSlice[i])
 	}
-	return placeholderNames
+	return csvSlice
 }
 
 // detectCoefficientToInt returns by how much we must multiply the input to get an integer
