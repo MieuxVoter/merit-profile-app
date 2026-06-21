@@ -14,6 +14,18 @@ other = "mentions"
 [ActionGenerate]
 other = "Générer"
 
+[InstructionProvideTallies]
+other = "Fournissez les décomptes ci-dessous ou {{.Value0}} à la place."
+
+[InstructionUploadCsvFile]
+other = "Téléversez un fichier CSV ci-dessous ou {{.Value0}} à la place."
+
+[LinkUploadCsvFile]
+other = "téléversez un fichier CSV"
+
+[LinkProvideTallies]
+other = "fournissez directement les décomptes"
+
 [SettingRankWithMjLabel]
 other = "Classer au Jugement Majoritaire"
 
