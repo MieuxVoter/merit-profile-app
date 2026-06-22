@@ -53,6 +53,9 @@ other = "Your CSV file should look something like this:"
 [FieldCsvFileInfoTitle]
 other = "This is only an example.  Your file may have more grades (more columns), and of course more candidates (more rows)."
 
+[LinkSourceCodeTitle]
+other = "Browse the source code, report issues and contribute."
+
 [ProposalNamePlaceholders]
 other = "Arancini,Burger,Chips,Dal,Empanadas,Fries,Gnocchis,Kale,Lasagna,Makis,Noodles,Oatmeal,Pizza,Rice,Soup,Tacos,Veggies"
 

@@ -53,6 +53,9 @@ other = "Votre fichier CSV devrait ressembler à ceci:"
 [FieldCsvFileInfoTitle]
 other = "Ce n'est qu'un exemple.  Votre fichier peut définir plusse de mentions (+ de colonnes), et bien sûr plusse de propositions (+ de lignes)."
 
+[LinkSourceCodeTitle]
+other = "Lire le code source, signaler un problème et contribuer."
+
 [ProposalNamePlaceholders]
 other = "Aligot,Bouillabaisse,Choucroute,Daube,Enchiladas,Frites,Gratin,Houmous,Lasagnes,Makis,Nouilles,Omelette,Pizza,Riz,Soupe,Tajine,Velouté"
 

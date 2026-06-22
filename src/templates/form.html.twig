@@ -39,10 +39,12 @@ bread,                4,        1,    4,         3</pre>
         {% for i in 0..placeholderNames|length-1 %}
         <fieldset class="proposal">
             <input type="text" name="n"
+                   class="proposal-name"
                    title="{{ 'FieldProposalNameTitle'|t(i+1) }}"
                    placeholder="{{ placeholderNames[i] }}"
                    maxlength="32">
             <input type="text" name="t" {% if loop.first %}required{% endif %}
+                   class="proposal-tally"
                    placeholder="4,12,0,9,5,1,7"
                    pattern="\s*\d+\s*(\s*,\s*\d+\s*)*"
                    title="{{ 'FieldProposalTallyTitle'|t(i+1) }}">

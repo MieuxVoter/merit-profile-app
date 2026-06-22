@@ -5,6 +5,10 @@
     <meta name="description" content="Generate merit profiles from tallies, and rank proposals using Majority Judgment.">
     <meta name="keywords" content="merit,poll,vote,majority,judgment,svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta property="og:image" content="/img/example.png">
+    <meta property="og:image:alt" content="Example merit profiles of class holiday destinations.">
+
     <title>{% block title %}{{ 'AppTitle'|t }}{% endblock %}</title>
     <link rel="icon" sizes="256x256" href="/favicon.png">
 {% block style_base %}
@@ -34,7 +38,7 @@
             <li>&mdash;</li>
             <li>
                 <a href="https://github.com/MieuxVoter/merit-profile-app"
-                   title="Browse the source code and contribute">{{ version }}</a>
+                   title="{{ 'LinkSourceCodeTitle'|t }}">{{ version }}</a>
             </li>
             <li>&mdash;</li>
             <li>

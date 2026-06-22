@@ -22,6 +22,12 @@
         --main-bg-color: #ffffff;
     }
 }
+@font-face {
+    font-family: 'DM Serif Display';
+    font-style: normal;
+    font-weight: normal;
+    src: local('DM Serif Display'), url('../font/DMSerifDisplay-Regular.woff') format('woff');
+}
 body, textarea, input {
     color: var(--main-color);
     background-color: var(--main-bg-color);
@@ -49,6 +55,17 @@ a:active { color: var(--link-active-color); }
 label {
     cursor: pointer;
 }
+input[type=text] {
+    border-color: var(--main-color-dim);
+    border-width: 0 0 medium 0;
+}
+input[type=text]:hover,
+input[type=text]:focus {
+    border-color: var(--main-color);
+}
+input[type=text]::placeholder {
+    color: var(--main-color-dim);
+}
 button[type=submit],
 input[type=submit] {
     margin: 1em auto;
@@ -56,21 +73,25 @@ input[type=submit] {
     cursor: pointer;
     border-radius: 0.5em;
 }
+label:has(input[disabled]) {
+    opacity: 0.618;
+}
 ul.inline li {
     display: inline-flex;
 }
 
 /* FOOTER */
-
 footer {
     font-size: 0.8em;
 }
 
-/* FORM SHENANIGANS */
-
-label:has(input[disabled]) {
-    opacity: 0.618;
+/* FORM CUSTOMIZATION */
+input.proposal-name,
+input.proposal-tally {
+    font-family: monospace;
 }
+
+/* FORM SHENANIGANS */
 fieldset.proposal {
     display: none;
 }
