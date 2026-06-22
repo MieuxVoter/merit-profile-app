@@ -34,3 +34,12 @@ make start
 ```
 
 Then, visit http://localhost:8033
+
+### Watch for changes and reload
+
+During development, for fast iterations, it's handy to reload the webserver when a file changes.
+I'm using `entr` for this, it works like a charm:
+
+```bash
+find src | entr -r go run src/main.go
+```
