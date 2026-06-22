@@ -31,7 +31,6 @@
 body, textarea, input {
     color: var(--main-color);
     background-color: var(--main-bg-color);
-    border-width: 1px;
     font-family: sans-serif;
 }
 textarea {
@@ -71,7 +70,8 @@ input[type=submit] {
     margin: 1em auto;
     padding: 0.62em 1em;
     cursor: pointer;
-    border-radius: 0.5em;
+    border-width: thin thin thick thin;
+    /*border-color: var(--main-color);*/
 }
 label:has(input[disabled]) {
     opacity: 0.618;
@@ -87,6 +87,7 @@ footer {
 
 /* MV CUSTOMIZATION */
 body {
+    min-height: 90vh;
     background-image: url("/img/chevron-bicolore.svg");
     background-repeat: no-repeat;
     background-size: contain;
