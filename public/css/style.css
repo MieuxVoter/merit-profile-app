@@ -42,7 +42,7 @@ textarea {
 }
 fieldset {
     margin: 0.5em 0;
-    border-width: 1px;
+    border-width: 0;
     border-color: var(--main-color-dimmer);
 }
 h1, h2, h3, h4, h5, h6 {
@@ -85,7 +85,14 @@ footer {
     font-size: 0.8em;
 }
 
-/* FORM CUSTOMIZATION */
+/* MV CUSTOMIZATION */
+body {
+    background-image: url("/img/chevron-bicolore.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position-x: calc(100% + 50px);
+    background-position-y: 0;
+}
 input.proposal-name,
 input.proposal-tally {
     font-family: monospace;
