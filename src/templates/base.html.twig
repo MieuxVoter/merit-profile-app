@@ -17,13 +17,18 @@
 {% block style_extra %}{% endblock %}
 </head>
 <body>
+{% block header %}
+    <header>
+        <h1>{{ 'AppTitle'|t }}</h1>
+    </header>
+{% endblock %}
 {% block content %}{% endblock %}
 {% block footer %}
     <footer>
         <ul class="inline">
             <li>
                 <a href="https://mieuxvoter.fr">
-                    <img src="img/logo-mieuxvoter.svg" alt="MV" aria-hidden="true" height="10">
+                    <img src="/img/logo-mieuxvoter.svg" alt="MV" aria-hidden="true" height="10">
                     MieuxVoter
                 </a>
             </li>
