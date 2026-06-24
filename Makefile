@@ -44,7 +44,8 @@ build-mac-64: $(shell find src -name \*)  ## Build the apple binary executable
 
 release: build  ## Build and compress
 	upx --ultra-brute --best "build/$(NAME)"
-	upx --ultra-brute --best "build/$(NAME)_mac"
+	@# upx: build/mpa_mac: CantPackException: macOS is currently not supported (try --force-macos)
+	@#upx --ultra-brute --best "build/$(NAME)_mac"
 	upx --ultra-brute --best "build/$(NAME)_win.exe"
 
 clean:  ## Remove built files
