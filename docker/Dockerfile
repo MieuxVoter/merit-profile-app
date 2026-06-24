@@ -5,7 +5,7 @@ RUN touch .env.local
 RUN make clean
 RUN --mount=type=cache,sharing=locked,target=/go/pkg/mod \
     --mount=type=cache,sharing=locked,target=/root/.cache/go-build \
-    make build
+    make build-linux-64
 
 
 FROM dhi.io/debian-base:trixie-dev AS provider
@@ -16,7 +16,7 @@ RUN --mount=type=cache,sharing=locked,target=/var/lib/apt/lists \
     && apt-get update \
     && apt-get --yes --no-install-recommends install \
         make
-    # Note: We don't actually *need* make ; but eventually we will need some packages.
+    # Note: We don't actually *need* make ; but eventually we will need some packages?
 
 
 FROM dhi.io/debian-base:trixie AS runner
@@ -27,5 +27,4 @@ WORKDIR /app
 COPY --from=builder /build/build/mpa ./
 COPY --from=builder /build/.env ./
 COPY --from=builder /build/.env.local ./
-COPY --from=builder /build/public ./public/
 CMD ["/app/mpa"]
