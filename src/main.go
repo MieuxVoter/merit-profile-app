@@ -17,6 +17,7 @@ import (
 	"log/slog"
 	"main/src/input"
 	"main/src/locales"
+	"main/src/public"
 	"main/src/templates"
 	"main/src/version"
 	"math"
@@ -378,7 +379,8 @@ func main() {
 	})
 
 	// We also want to serve some static files, like CSS and the favicon
-	staticFiles := http.FileServer(http.Dir("public"))
+	//staticFiles := http.FileServer(http.Dir("public")) // using dir
+	staticFiles := http.FileServer(http.FS(public.EmbedFS)) // or using embed
 	router.Handle("/*", http.StripPrefix("/", staticFiles))
 
 	// Finally, let's start the webserver and wait for an interrupting signal
