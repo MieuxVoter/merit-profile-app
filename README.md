@@ -29,10 +29,10 @@ Try it out at https://educ.mieuxvoter.fr
 ## Use it offline
 
 1. Download the appropriate executable for your operating system
-    - Download for Linux
-    - Download for Mac
-    - Download for Windows
-2. Run it
+    - [Download for Linux](https://github.com/MieuxVoter/merit-profile-app/releases/latest/download/mpa)
+    - [Download for Mac](https://github.com/MieuxVoter/merit-profile-app/releases/latest/download/mpa_mac)
+    - [Download for Windows](https://github.com/MieuxVoter/merit-profile-app/releases/latest/download/mpa_win.exe)
+2. Execute it _(it won't open a window — it will look like it does nothing)_
 3. Visit http://localhost:8033
 4. _Star this repository if you're happy_
 
