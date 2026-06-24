@@ -16,7 +16,7 @@ jobs:
           go-version: "1.25"
 
       - name: Go Get
-        run: go get
+        run: go get ./src
 
       - name: Install the Ultimate Packer of Executables
         run: sudo apt install --yes upx
