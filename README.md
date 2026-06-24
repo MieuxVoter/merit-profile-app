@@ -21,7 +21,31 @@ Try it out at https://educ.mieuxvoter.fr
 - [x] Docker configuration for deployment
 
 
-## Run locally
+## Use it online
+
+Try it out at https://educ.mieuxvoter.fr
+
+
+## Use it offline
+
+1. Download the appropriate executable for your operating system
+    - Download for Linux
+    - Download for Mac
+    - Download for Windows
+2. Run it
+3. Visit http://localhost:8033
+4. _Star this repository if you're happy_
+
+### Customize the web port
+
+If you want to use another port than `8033`, you may specify the `WEB_PORT` environment variable, for example like so:
+
+```bash
+WEB_PORT=7777 ./mpa
+```
+
+
+## Developers — Run locally
 
 ```shell
 make build && build/mpa
