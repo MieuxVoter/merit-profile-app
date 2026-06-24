@@ -17,6 +17,7 @@ import (
 	"log/slog"
 	"main/src/input"
 	"main/src/locales"
+	"main/src/public"
 	"main/src/templates"
 	"main/src/version"
 	"math"
@@ -32,13 +33,19 @@ var polyglotKey = "AppTitle"
 
 func main() {
 
+	logger := slog.Default()
 	loadDotEnv()
+
 	serverPort, foundServerPort := os.LookupEnv("WEB_PORT")
 	if !foundServerPort {
-		panic("Environment variable WEB_PORT is required.")
+		serverPort = "8033"
+		logger.Info(fmt.Sprintf(
+			"Environment variable WEB_PORT was not found.  "+
+				"Defaulting to WEB_PORT=%s",
+			serverPort,
+		))
 	}
 
-	logger := slog.Default()
 	logger.Info("Starting web server…")
 
 	localization := &locales.Localization{
@@ -378,11 +385,12 @@ func main() {
 	})
 
 	// We also want to serve some static files, like CSS and the favicon
-	staticFiles := http.FileServer(http.Dir("public"))
+	//staticFiles := http.FileServer(http.Dir("public")) // using dir
+	staticFiles := http.FileServer(http.FS(public.EmbedFS)) // or using embed
 	router.Handle("/*", http.StripPrefix("/", staticFiles))
 
 	// Finally, let's start the webserver and wait for an interrupting signal
-	logger.Info("Visit http://localhost:" + serverPort)
+	logger.Info(fmt.Sprintf("Visit http://localhost:%s in your favorite web browser.", serverPort))
 	_ = http.ListenAndServe(":"+serverPort, router)
 }
 
@@ -405,7 +413,8 @@ func loadDotEnv() {
 	}
 	err = godotenv.Load() // .env
 	if err != nil {
-		fmt.Println("No .env file found.  Odd.")
+		// It's okay, we do not actually *require* a local env, since we have no secrets.
+		//fmt.Println("No .env file found.  Odd.")
 	}
 }
 

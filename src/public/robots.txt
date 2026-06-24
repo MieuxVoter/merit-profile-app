@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /merit.svg
+Sitemap: https://educ.mieuxvoter.fr/sitemap.xml
