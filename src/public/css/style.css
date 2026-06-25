@@ -2,7 +2,7 @@
     --main-color: #efefff;
     --main-bg-color: #2400fd;
     --main-color-dim: hsl(from var(--main-color) h s calc(l - 20));
-    --main-color-dimmer: hsl(from var(--main-color) h s calc(l - 40));
+    /*--main-color-dimmer: hsl(from var(--main-color) h s calc(l - 40));*/
     --link-color: inherit;
     --link-visited-color: inherit;
     --link-hover-color: inherit;
@@ -42,7 +42,6 @@ textarea {
 fieldset {
     margin: 0.5em 0;
     border-width: 0;
-    border-color: var(--main-color-dimmer);
 }
 h1, h2, h3, h4, h5, h6 {
     font-family: "DM Serif Display",serif;
@@ -71,7 +70,14 @@ input[type=submit] {
     padding: 0.62em 1em;
     cursor: pointer;
     border-width: thin thin thick thin;
-    /*border-color: var(--main-color);*/
+    /* I'm not sure why this is not behaving as expected */
+    border-color: var(--main-color);
+}
+button[type=submit]:hover,
+input[type=submit]:hover {
+    color: var(--main-bg-color);
+    background-color: var(--main-color);
+    border-color: var(--main-color);
 }
 label:has(input[disabled]) {
     opacity: 0.618;
