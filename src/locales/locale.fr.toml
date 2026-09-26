@@ -32,10 +32,10 @@ other = "Classer au Jugement Majoritaire"
 [SettingRankWithMjTitle]
 other = "Si activé, les profils de mérite générés seront classés du \"meilleur\" au \"pire\"."
 
-[SettingHighToLowLabel]
+[SettingReadHighToLowLabel]
 other = "Lire Meilleure Mention → Pire Mention"
 
-[SettingHighToLowTitle]
+[SettingReadHighToLowTitle]
 other = "Par défaut, cet outil lit les profils de mérite de la \"pire\" mention vers la \"meilleure\" mention.  Si cette option est activée, l'ordre de lecture est inversé."
 
 [FieldProposalNameTitle]
