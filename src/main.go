@@ -5,14 +5,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
-	"github.com/mieuxvoter/majority-judgment-library-go/judgment"
-	"github.com/mieuxvoter/merit-profile-library-go/merit"
-	"github.com/tyler-sommer/stick"
-	"github.com/tyler-sommer/stick/twig"
-	"golang.org/x/text/language"
 	"io"
 	"log/slog"
 	"main/src/input"
@@ -25,6 +17,15 @@ import (
 	"os"
 	"slices"
 	"strings"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
+	"github.com/mieuxvoter/majority-judgment-library-go/judgment"
+	"github.com/mieuxvoter/merit-profile-library-go/merit"
+	"github.com/tyler-sommer/stick"
+	"github.com/tyler-sommer/stick/twig"
+	"golang.org/x/text/language"
 )
 
 // polyglotKey MUST be defined in all available language files.
@@ -103,7 +104,8 @@ func main() {
 		r *http.Request,
 		proposalsNames []string,
 		proposalsTallies []*judgment.ProposalTally,
-		bestOnTheLeft bool,
+		readHighToLow bool,
+		displayHighToLow bool,
 		doSortWithMj bool,
 	) {
 		localizer, _ := localization.NewLocalizerAndLanguage(
@@ -214,7 +216,7 @@ func main() {
 		}
 
 		renderOptions := []merit.RenderOptions{
-			merit.WithBestGradeOnLeft(true),
+			merit.WithBestGradeOnLeft(displayHighToLow),
 			merit.WithWidth(980),
 		}
 		if doSortWithMj {
@@ -245,10 +247,12 @@ func main() {
 		query := r.URL.Query()
 		queryProposals := query["n"]
 		queryTalliesAsStrings := query["t"]
-		queryHighToLow := query["h2l"]
+		queryReadHighToLow := query["h2l"]
+		queryDisplayHighToLow := query["g2r"]
 		querySortWithMj := query["mj"]
 
-		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
+		readHighToLow := input.CheckboxQueryToBool(queryReadHighToLow)
+		displayHighToLow := input.CheckboxQueryToBool(queryDisplayHighToLow)
 		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
 
 		amountOfPossibleProposals := len(queryTalliesAsStrings)
@@ -273,7 +277,7 @@ func main() {
 				handleUserError(err, w)
 				return
 			}
-			if bestOnTheLeft {
+			if readHighToLow {
 				slices.Reverse(queryTally)
 			}
 
@@ -291,7 +295,8 @@ func main() {
 			r,
 			proposalsNames,
 			proposalsTallies,
-			bestOnTheLeft,
+			readHighToLow,
+			displayHighToLow,
 			doSortWithMj,
 		)
 	})
@@ -308,10 +313,12 @@ func main() {
 			return
 		}
 
-		queryHighToLow := r.MultipartForm.Value["h2l"]
+		queryReadHighToLow := r.MultipartForm.Value["h2l"]
+		queryDisplayHighToLow := r.MultipartForm.Value["g2r"]
 		querySortWithMj := r.MultipartForm.Value["mj"]
 
-		bestOnTheLeft := input.CheckboxQueryToBool(queryHighToLow)
+		readHighToLow := input.CheckboxQueryToBool(queryReadHighToLow)
+		displayHighToLow := input.CheckboxQueryToBool(queryDisplayHighToLow)
 		doSortWithMj := input.CheckboxQueryToBool(querySortWithMj)
 
 		//w.Write([]byte(fmt.Sprintf("MultipartForm.Value: %v\n", r.MultipartForm.Value)))
@@ -345,7 +352,7 @@ func main() {
 		}
 
 		pr := input.ProfilesCsvReader{}
-		tallies, proposals, _, csvErr := pr.Read(&fileHandle, !bestOnTheLeft)
+		tallies, proposals, _, csvErr := pr.Read(&fileHandle, !readHighToLow)
 		if csvErr != nil {
 			handleUserError(csvErr, w)
 			return
@@ -379,7 +386,8 @@ func main() {
 			r,
 			proposalsNames,
 			proposalsTallies,
-			bestOnTheLeft,
+			readHighToLow,
+			displayHighToLow,
 			doSortWithMj,
 		)
 	})

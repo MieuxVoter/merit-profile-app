@@ -52,13 +52,18 @@ bread,                4,        1,    4,         3</pre>
         {% endif %}
 
         <fieldset>
-            <label title="{{ 'SettingHighToLowTitle'|t }}">
+            <label title="{{ 'SettingReadHighToLowTitle'|t }}">
                 <input type="checkbox" name="h2l">
-                {{ 'SettingHighToLowLabel'|t }}
+                {{ 'SettingReadHighToLowLabel'|t }}
+            </label>
+            <br>
+            <label title="{{ 'SettingDisplayHighToLowTitle'|t }}">
+                <input type="checkbox" name="g2r" checked>
+                {{ 'SettingDisplayHighToLowLabel'|t }}
             </label>
             <br>
             <label title="{{ 'SettingRankWithMjTitle'|t }}">
-                <input type="checkbox" name="mj">
+                <input type="checkbox" name="mj" checked>
                 {{ 'SettingRankWithMjLabel'|t }}
             </label>
         </fieldset>
