@@ -55,8 +55,8 @@ func main() {
 	localization.Init(language.English)
 
 	templateEngine := twig.New(
-		&templates.EmbedFSLoader{
-			FS: templates.TemplatesFS,
+		&templates.EmbeddedTemplateLoader{
+			FS: templates.EmbeddedFS,
 		},
 	)
 	twigErr := templateEngine.Register(locales.LocalizationExtension{
@@ -394,7 +394,7 @@ func main() {
 
 	// We also want to serve some static files, like CSS and the favicon
 	//staticFiles := http.FileServer(http.Dir("public")) // using dir
-	staticFiles := http.FileServer(http.FS(public.EmbedFS)) // or using embed
+	staticFiles := http.FileServer(http.FS(public.EmbeddedFS)) // or using embed
 	router.Handle("/*", http.StripPrefix("/", staticFiles))
 
 	// Finally, let's start the webserver and wait for an interrupting signal
