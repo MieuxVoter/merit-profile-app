@@ -94,11 +94,15 @@ footer {
 /* MV CUSTOMIZATION */
 body {
     min-height: 90vh;
-    background-image: url("/img/chevron-bicolore.svg");
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position-x: calc(100% + 50px);
-    background-position-y: 0;
+}
+@media screen and (min-width: 1024px) {
+    body {
+        background-image: url("/img/chevron-bicolore.svg");
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position-x: calc(100% + 50px);
+        background-position-y: 0;
+    }
 }
 input.proposal-name,
 input.proposal-tally {
