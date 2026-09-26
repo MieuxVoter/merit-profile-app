@@ -5,6 +5,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"image/color"
 	"io"
 	"log/slog"
 	"main/src/input"
@@ -55,8 +56,8 @@ func main() {
 	localization.Init(language.English)
 
 	templateEngine := twig.New(
-		&templates.EmbedFSLoader{
-			FS: templates.TemplatesFS,
+		&templates.EmbeddedTemplateLoader{
+			FS: templates.EmbeddedFS,
 		},
 	)
 	twigErr := templateEngine.Register(locales.LocalizationExtension{
@@ -107,6 +108,7 @@ func main() {
 		readHighToLow bool,
 		displayHighToLow bool,
 		doSortWithMj bool,
+		bgColor color.Color,
 	) {
 		localizer, _ := localization.NewLocalizerAndLanguage(
 			polyglotKey,
@@ -218,6 +220,7 @@ func main() {
 		renderOptions := []merit.RenderOptions{
 			merit.WithBestGradeOnLeft(displayHighToLow),
 			merit.WithWidth(980),
+			merit.WithBgColor(bgColor),
 		}
 		if doSortWithMj {
 			renderOptions = append(renderOptions, merit.WithGradesOutlines(gradesOutlines))
@@ -250,6 +253,7 @@ func main() {
 		queryReadHighToLow := query["h2l"]
 		queryDisplayHighToLow := query["g2r"]
 		querySortWithMj := query["mj"]
+		queryBgColor := input.QueryToColor(query["bg"], color.White)
 
 		readHighToLow := input.CheckboxQueryToBool(queryReadHighToLow)
 		displayHighToLow := input.CheckboxQueryToBool(queryDisplayHighToLow)
@@ -298,6 +302,7 @@ func main() {
 			readHighToLow,
 			displayHighToLow,
 			doSortWithMj,
+			queryBgColor,
 		)
 	})
 
@@ -316,6 +321,7 @@ func main() {
 		queryReadHighToLow := r.MultipartForm.Value["h2l"]
 		queryDisplayHighToLow := r.MultipartForm.Value["g2r"]
 		querySortWithMj := r.MultipartForm.Value["mj"]
+		queryBgColorHex := input.QueryToColor(r.MultipartForm.Value["bg"], color.White)
 
 		readHighToLow := input.CheckboxQueryToBool(queryReadHighToLow)
 		displayHighToLow := input.CheckboxQueryToBool(queryDisplayHighToLow)
@@ -389,12 +395,13 @@ func main() {
 			readHighToLow,
 			displayHighToLow,
 			doSortWithMj,
+			queryBgColorHex,
 		)
 	})
 
 	// We also want to serve some static files, like CSS and the favicon
 	//staticFiles := http.FileServer(http.Dir("public")) // using dir
-	staticFiles := http.FileServer(http.FS(public.EmbedFS)) // or using embed
+	staticFiles := http.FileServer(http.FS(public.EmbeddedFS)) // or using embed
 	router.Handle("/*", http.StripPrefix("/", staticFiles))
 
 	// Finally, let's start the webserver and wait for an interrupting signal

@@ -1,8 +1,11 @@
 package input
 
 import (
+	"image/color"
 	"strconv"
 	"strings"
+
+	"github.com/mazznoer/csscolorparser"
 )
 
 // CheckboxQueryToBool converts the "on" string we receive from chi from checkboxes to a bool.
@@ -15,6 +18,23 @@ func CheckboxQueryToBool(queryParamValue []string) bool {
 		}
 	}
 	return out
+}
+
+func QueryToString(queryParamValue []string, defaultValue string) string {
+	out := defaultValue
+	if len(queryParamValue) > 0 {
+		out = queryParamValue[0]
+	}
+	return out
+}
+
+func QueryToColor(queryParamValue []string, defaultColor color.Color) color.Color {
+	s := QueryToString(queryParamValue, "")
+	c, err := csscolorparser.Parse(s)
+	if err != nil {
+		return defaultColor
+	}
+	return c
 }
 
 // DeserializeTally converts a comma-separated string of integer values to a slice of unsigned integers.
