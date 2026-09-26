@@ -33,6 +33,19 @@ body, textarea, input {
     background-color: var(--main-bg-color);
     font-family: sans-serif;
 }
+h1, h2, h3, h4, h5, h6 {
+    font-family: "DM Serif Display",serif;
+}
+a:link { color: var(--link-color); }
+a:visited { color: var(--link-visited-color); }
+a:hover { color: var(--link-hover-color); }
+a:active { color: var(--link-active-color); }
+details summary {
+    cursor: pointer;
+}
+label {
+    cursor: pointer;
+}
 textarea {
     width: 100%;
     margin: 1em 0;
@@ -42,16 +55,14 @@ textarea {
 fieldset {
     margin: 0.5em 0;
     border-width: 0;
+    display: block;
 }
-h1, h2, h3, h4, h5, h6 {
-    font-family: "DM Serif Display",serif;
+fieldset label.color {
+    display: flex;
 }
-a:link { color: var(--link-color); }
-a:visited { color: var(--link-visited-color); }
-a:hover { color: var(--link-hover-color); }
-a:active { color: var(--link-active-color); }
-label {
-    cursor: pointer;
+fieldset label.color span {
+    align-self: center;
+    margin-left: 0.5rem;
 }
 input[type=text] {
     border-color: var(--main-color-dim);

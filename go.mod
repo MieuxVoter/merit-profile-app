@@ -17,5 +17,6 @@ require (
 require (
 	github.com/ajstarks/gensvg v0.0.0-20210923152200-4042c242e95e // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
+	github.com/mazznoer/csscolorparser v0.1.8 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 )
