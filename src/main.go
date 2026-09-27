@@ -221,6 +221,7 @@ func main() {
 			merit.WithBestGradeOnLeft(displayHighToLow),
 			merit.WithWidth(980),
 			merit.WithBgColor(bgColor),
+			merit.WithGradesOutlinesColor(invertColor(bgColor)),
 		}
 		if doSortWithMj {
 			renderOptions = append(renderOptions, merit.WithGradesOutlines(gradesOutlines))
@@ -458,4 +459,14 @@ func detectCoefficientToInt(value float64) float64 {
 		p *= 10.0
 	}
 	return p
+}
+
+func invertColor(c color.Color) color.Color {
+	r, g, b, _ := c.RGBA()
+	return color.NRGBA{
+		R: uint8(255 - r),
+		G: uint8(255 - g),
+		B: uint8(255 - b),
+		A: 255,
+	}
 }
